@@ -4,10 +4,10 @@ LABEL maintainer="Christian Gommans <info@cgweb.net>"
 
 ARG conda_env=ai
 
-COPY --chown=${NB_UID}:${NB_GID} Docker/env.yml /home/$NB_USER/tmp/
+COPY --chown=${NB_UID}:${NB_GID} environment.yml /home/$NB_USER/tmp/
 
 RUN cd /home/$NB_USER/tmp/ && \
-	conda env create -p $CONDA_DIR/envs/$conda_env -f env.yml && \
+	conda env create -p $CONDA_DIR/envs/$conda_env -f environment.yml && \
     conda clean --all -f -y
 
 RUN $CONDA_DIR/envs/${conda_env}/bin/python -m ipykernel install --user --name=${conda_env} && \
