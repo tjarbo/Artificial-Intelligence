@@ -1,0 +1,19 @@
+name: ai
+channels:
+    - conda-forge
+    - defaults
+dependencies:
+    - python=3
+    - jupyter
+    - jupyter_contrib_nbextensions
+    - graphviz
+    - python-graphviz
+    - ply
+    - ipycanvas
+    - matplotlib
+    - seaborn
+    - scikit-learn
+    - notebook
+    - memory_profiler
+    - pip:
+        - python-chess
