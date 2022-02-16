@@ -3,13 +3,13 @@ One major breakthrough for the field of artificial intelligence happened in 1997
 \href{https://en.wikipedia.org/wiki/Deep_Blue_(chess_computer)}{Deep Blue} was able to beat the World Chess
 Champion \href{https://en.wikipedia.org/wiki/Garry_Kasparov}{Garry Kasparov} by $3\sfrac{1}{2}-2\sfrac{1}{2}$.
 While \blue{Deep Blue} \index{deep blue} was based on special hardware, according to the
-\href{http://www.computerchess.org.uk/ccrl/4040/rating_list_all.html}{computer chess rating list} of the 18th
-of December 2021, the chess program \href{https://en.wikipedia.org/wiki/Stockfish_(chess)}{Stockfish} runs
-on ordinary desktop computers and has an \href{https://en.wikipedia.org/wiki/Elo_rating_system}{Elo rating} of 3544.  
+\href{http://www.computerchess.org.uk/ccrl/4040/rating_list_all.html}{computer chess rating list} of the 5th
+of February 2022, the chess program \href{https://en.wikipedia.org/wiki/Stockfish_(chess)}{Stockfish} runs
+on ordinary desktop computers and has an \href{https://en.wikipedia.org/wiki/Elo_rating_system}{Elo rating} of 3542.  
 To compare, according to the
-\href{https://ratings.fide.com/top.phtml?list=men}{Fide} list of December 2021, the current 
+\href{https://ratings.fide.com/top.phtml?list=men}{Fide} list of February 2022, the current 
 World Chess Champion \href{https://en.wikipedia.org/wiki/Magnus_Carlsen}{Magnus Carlsen} has an Elo rating of
-2856.  Hence, he wouldn't stand a chance to win a game against Stockfish.  In 2017, at the 
+2865.  Hence, he wouldn't stand a chance to win a game against Stockfish.  In 2017, at the 
 \href{https://en.wikipedia.org/wiki/Future_of_Go_Summit}{Future of Go Summit},  the computer program
 \href{https://en.wikipedia.org/wiki/AlphaGo}{AlphaGo} \index{AlphaGo} was able to beat
 \href{https://en.wikipedia.org/wiki/Ke_Jie}{Ke Jie}, \index{Ke Jie} 
@@ -66,28 +66,24 @@ where the components are interpreted as follows:
       \\[0.2cm]
       \hspace*{1.3cm}
       $\textts{TerminalStates} := \{ s \in \textts{States} \mid \textts{finished}(s) \}$.
-\item $\textts{utility}$ is a function that takes a state $s$ such that $s \in \textts{TerminalStates}$ and a
-      player $p$.  It returns 
-      the \blue{value} that the game has for the player $p$.  In general, a value is a real number,  but in all of
-      our examples, this value will be an element from the set $\{-1, 0, +1\}$.  If $\textts{utility}(s, p) = -1$,
-      then the player $p$ has lost the game, if $\textts{utility}(s, p) = 1$, then the player $p$ has won the game, and
-      if $\textts{utility}(s, p) = 0$, then the game drawn.  Hence the signature of $\textts{utility}$ is
+\item $\textts{utility}$ is a function that takes a state $s$ such that $s \in \textts{TerminalStates}$ as its argument.  It returns 
+      the \blue{value} that the game has for the first player, i.e. for $\textts{Players}[1]$.  In general, a
+      value is a real number,  but in all of our examples, this value will be an element from the set
+      $\{-1, 0, +1\}$.  If $\textts{utility}(s) = -1$,  
+      then the first player has lost the game, if $\textts{utility}(s) = 1$, then the first player has won the
+      game, and if $\textts{utility}(s) = 0$, then the game drawn.  Hence the signature of $\textts{utility}$ is
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\textts{utility}: \textts{TerminalStates} \times \textts{Players} \rightarrow \{ -1, 0, +1\}$.
+      $\textts{utility}: \textts{TerminalStates} \rightarrow \{ -1, 0, +1\}$.
 \end{enumerate}
 We will only consider so called \blue{two person zero sum games}.  
-This means that the list $\textts{Players}$ has exactly two elements.  If we call these players $\mathrm{A}$ and $\mathrm{B}$, i.e.~if we have
+This means that the list $\textts{Players}$ has exactly two elements.  If we call these players $\textts{A}$ and $\textts{B}$, i.e.~if we have
 \\[0.2cm]
 \hspace*{1.3cm}
-$\textts{Players} = \bigl[ \mathrm{A}, \mathrm{B} \bigr]$,
+$\textts{Players} = \bigl[ \textts{A}, \textts{B} \bigr]$,
 \\[0.2cm]
-then the game is called a \blue{zero sum game} \index{zero sum game} iff we have
-\\[0.2cm]
-\hspace*{1.3cm}
-$\forall s \in \textts{TerminalStates}:\textts{utility}(s, \textts{A}) + \textts{utility}(s, \textts{B}) = 0$,
-\\[0.2cm]
-i.e.~the losses of player $\mathrm{A}$ are compensated by the wins of player $\textts{B}$ and vice versa.
+then the game is called a \blue{zero sum game} \index{zero sum game} if $\textts{A}$ has won the game if
+and only if $\textts{B}$ has lost the game and vice versa.
 Games like \href{https://en.wikipedia.org/wiki/Go_(game)}{Go}, 
 \href{https://en.wikipedia.org/wiki/Chess}{chess}, and
 \href{https://en.wikipedia.org/wiki/Draughts}{draughts} are two person zero sum games.
@@ -120,15 +116,15 @@ the game is drawn.  In this section we present two different implementations of 
                 xleftmargin   = 0.8cm,
                 xrightmargin  = 0.8cm,
               ]{python3}
-    Players  = [ "X", "O" ]
-    Start    = tuple( tuple(" " for col in range(3)) for row in range(3))
+    gPlayers = [ "X", "O" ]
+    gStart   = tuple( tuple(" " for col in range(3)) for row in range(3))
     def to_list (State): return [list(row) for row in State]
     def to_tuple(State): return tuple(tuple(row) for row in State)
     
-    def empty(S):
+    def empty(State):
         return [ (row, col) for row in range(3)
                             for col in range(3)
-                            if  S[row][col] == ' ' 
+                            if  State[row][col] == ' ' 
                ]
     
     def next_states(State, player):
@@ -140,26 +136,26 @@ the game is drawn.  In this section we present two different implementations of 
             Result.append( to_tuple(NextState) )
         return Result
     
-    All_Lines = [ [ (row, col) for col in range(3) ] for row in range(3) ] \
+    gAllLines = [ [ (row, col) for col in range(3) ] for row in range(3) ] \
               + [ [ (row, col) for row in range(3) ] for col in range(3) ] \
               + [ [ (idx,   idx) for idx in range(3) ] ]                   \
               + [ [ (idx, 2-idx) for idx in range(3) ] ]
     
-    def utility(State, player):
-        for Pairs in All_Lines:
+    def utility(State):
+        for Pairs in gAllLines:
             Marks = { State[row][col] for row, col in Pairs }
             if len(Marks) == 1 and  Marks != { ' ' }: 
-                if Marks == { player }:
+                if Marks == { 'X' }:
                     return  1
                 else:
                     return -1
         for row in range(3):
             for col in range(3):
-                if State[row][col] == ' ':
+                if State[row][col] == ' ': # the board is not filled
                     return None   
         return 0            
     
-    def finished(State): return utility(State, "X") != None
+    def finished(State): return utility(State) != None
 \end{minted}
 \caption{A \textsl{Python} implementation of tic-tac-toe.}
 \label{fig:Tic-Tac-Toe.ipynb}
@@ -169,15 +165,15 @@ the game is drawn.  In this section we present two different implementations of 
 \FloatBarrier
 
 \begin{enumerate}
-\item The variable $\textts{Players}$ stores the list of players.  Traditionally, we use the characters
+\item The variable $\textts{gPlayers}$ stores the list of players.  Traditionally, we use the characters
       ``\textts{X}'' and ``\textts{O}'' to name the players.   
-\item The variable $\textts{Start}$ stores the start state, which is an empty board.
+\item The variable $\textts{gStart}$ stores the start state, which is an empty board.
       States are represented as tuples of tuples.  If $S$ is a state and $r,c \in \{0,1,2\}$,
       then $S[r][c]$ is the mark in row $r$ and column $c$.
       To represent states we have to use immutable data types, i.e.~tuples instead of lists, as we need to
       store states in sets later.  The entries in the inner tuples are the characters 
       ``\textts{X}'', ``\textts{O}'', and the blank character ``\textts{ }''.
-      As the state  $\textts{Start}$ is the empty board, it is represented as a tuple of three tuples
+      As the state  $\textts{gStart}$ is the empty board, it is represented as a tuple of three tuples
       containing three blanks each:
       \begin{Verbatim}
       ( (' ', ' ', ' '), 
@@ -212,14 +208,14 @@ the game is drawn.  In this section we present two different implementations of 
 
       Note that we had to turn the \textts{State} into a list of list in order to manipulate it.
       The manipulated State is then cast into a tuple of tuples.
-\item The function $\textts{utility}$ takes a $\textts{State}$ and a $\textts{player}$ as arguments.  If the game is 
+\item The function $\textts{utility}$ takes a $\textts{State}$ as its argument.  If the game is 
       finished in the given $\textts{State}$, it returns the value that this $\textts{State}$ has for the
-      current $\textts{player}$.  If the outcome of the game is not yet decided, the value $\mathtt{None}$
+      player \textts{"X"}.  If the outcome of the game is not yet decided, the value $\mathtt{None}$
       is returned instead. 
  
       In order to achieve its goal, the procedure first computes the set of all sets of coordinate pairs that 
       either specify a horizontal, vertical, or diagonal line on a $3 \times 3$ tic-tac-toe board.  Concretely,
-      the variable \textts{All\_Lines} has the following value:
+      the variable \textts{gAllLines} has the following value:
       \\[0.2cm]
       \hspace*{1.3cm}
       $
@@ -236,29 +232,29 @@ the game is drawn.  In this section we present two different implementations of 
       \end{array}
       $
       \\[0.2cm]
-      The first line in this expression gives the set of pairs defining the rows, the second line defines 
+      The first line in this expression gives the sets of pairs defining the rows, the second line defines 
       the columns, and the last line yields the two diagonals.  Given a state $\textts{State}$ and a set
       $\textts{Pairs}$, the set 
       \\[0.2cm]
       \hspace*{1.3cm}
-      \textts{Marks = \{ State[row][col] : [row, col] in Pairs \}}
+      \textts{Marks = \{ State[row][col] : (row, col) in Pairs \}}
       \\[0.2cm]
       is the set of all marks in the line specified by $\textts{Pairs}$.  For example, if 
       \\[0.2cm]
       \hspace*{1.3cm}
-      \textts{Pairs = \{ [1, 1], [2, 2], [3, 3] \}},
+      \textts{Pairs = \{ (1, 1), (2, 2), (3, 3) \}},
       \\[0.2cm]
       then $\textts{Marks}$ is the set of marks on the falling diagonal.
       The game is decided if all entries in a set of the form 
       \\[0.2cm]
       \hspace*{1.3cm}
-      \textts{Marks := \{ State[row][col] : [row, col] in Pairs \}}
+      \textts{Marks := \{ State[row][col] : (row, col) in Pairs \}}
       \\[0.2cm]
-      where \textts{Pairs} is a list from \textts{all\_lines} either have the value
+      where \textts{Pairs} is a list from \textts{gAllLines} either have the value
       ``$\textts{X}$'' or the value ``$\textts{O}$''.  In this case, the set \textts{Marks} has exactly one
-      element which is different from the blank.  If this element is the same as $\textts{player}$, then the
-      game is \blue{won} by $\textts{player}$, otherwise it must be the mark of his opponent and hence the game
-      is \blue{lost} for him. 
+      element which is different from the blank.  If this element is $\textts{"X"}$, then the
+      game is \blue{won} by $\textts{"X"}$, otherwise the element must be $\textts{"O"}$ and hence
+      the game has a value of $-1$ for $\textts{"X"}$.
 
       If there are any empty squares on the board but the game has not yet been decided,
       then the function returns \textts{None}.  Finally, if there are no more empty squares left, the game is a
@@ -293,8 +289,8 @@ this implementation.
                  xleftmargin   = 0.8cm,
                  xrightmargin  = 0.8cm,
                ]{python3}
-    Players = [0, 1]
-    Start = 0
+    gPlayers = [0, 1]
+    gStart = 0
     
     def set_bits(Bits):
         result = 0
@@ -318,22 +314,22 @@ this implementation.
             Result.append(next_state)
         return Result
 
-    All_Lines = [ set_bits([0,1,2]), set_bits([3,4,5]), set_bits([6,7,8]), 
+    gAllLines = [ set_bits([0,1,2]), set_bits([3,4,5]), set_bits([6,7,8]), 
                   set_bits([0,3,6]), set_bits([1,4,7]), set_bits([2,5,8]), 
                   set_bits([0,4,8]), set_bits([2,4,6])                     ]
 
-    def utility(state, player):
-        for mask in All_Lines:
+    def utility(state):
+        for mask in gAllLines:
             if state & mask == mask:
-                return 1 - 2 * player  # player 'X' has won
+                return 1              # player 'X' has won
             if (state >> 9) & mask == mask:
-                return -1 + 2 * player # player 'O' has won
+                return -1             # player 'O' has won
         # 511 == 2**9 - 1 = 0b1_1111_1111  
         if (state & 511) | (state >> 9) != 511: # the board is not yet filled
             return None
         return 0 # it's a draw
     
-    finished = lambda state: utility(state, 0) != None
+    finished = lambda state: utility(state) != None
 \end{minted}
 \vspace*{-0.3cm}
 \caption{Tic-Tac-Toe implemented by a bitboard.}
@@ -345,7 +341,7 @@ this implementation.
 \item When we use bitboards to implement tic-tac-toe it is more convenient to store the players as numbers. The
       first player \textts{X} is encoded as the number $0$, while the second player \textts{O} is encoded as
       the number $1$. 
-\item In the state \textts{Start}, no mark has been placed on the board.  Hence all bits are unset and therefore this
+\item In the state \textts{gStart}, no mark has been placed on the board.  Hence all bits are unset and therefore this
       state is represented by the number $0$. 
 \item The function \textts{set\_bits} takes a list of natural numbers as its argument \textts{Bits}.  These numbers specify
       the bits that should be set.  It returns an integer where all bits specified in the argument
@@ -387,34 +383,65 @@ Conceptually, the notion of the \blue{value} of a state is an extension of the n
 states, the value is defined for all states.  Formally, we define a function
 \\[0.2cm]
 \hspace*{1.3cm}
-$\textts{value}: \textts{States} \times \textts{Players} \rightarrow \{-1, 0, +1\}$
+$\textts{maxValue}: \textts{States} \rightarrow \{-1, 0, +1\}$
 \\[0.2cm]
-that takes a state $s \in \textts{States}$ and a player $p \in \textts{Players}$ and returns the value of the
-state $s$ provided that both the player $p$ and his opponent play \blue{optimally}.  The easiest way to define
-this function is via recursion.  As the 
-\textts{value} function is an extension of the \textts{utility} function, the base case is as follows:
+that takes a state $s \in \textts{States}$ returns the value that the state $s$ has for the first player, who
+tries to maximize the value of the state, provided that both the player $p$ and his opponent play
+\blue{optimally}.  The easiest way to define this function is via recursion.  As the 
+\textts{maxValue} function is an extension of the \textts{utility} function, the base case is as follows:
 \\[0.2cm]
-\hspace*{1.3cm}
-$\textts{finished}(s) \rightarrow \textts{value}(s, p) = \textts{utility}(s, p)$. \hspace*{\fill} (1)
+\hspace*{0.3cm}
+$\textts{finished}(s) \rightarrow \textts{maxValue}(s) = \textts{utility}(s)$. \hspace*{\fill} (1)
 \\[0.2cm]
-If the game is not yet finished, assume that player $o$ is the opponent of player $p$.  Then we define
+If the game is not yet finished, we define
 \\[0.2cm]
-\hspace*{1.3cm}
+\hspace*{0.3cm}
 $\neg \textts{finished}(s) \rightarrow 
- \textts{value}(s, p) = \max\bigl(\bigl\{
-                     -\textts{value}(n, o) \bigm| n \in \textts{nextStates}(s, p)
+ \textts{maxValue}(s) = \max\bigl(\bigl\{
+                     \textts{valueMin}(n) \bigm| n \in \textts{nextStates}(s, \mathtt{gPlayers}[0])
                      \bigr\}\bigr)
 $.  \hspace*{\fill} (2)
 \\[0.2cm]
-The reason is that, if the game is not finished yet, the player $p$ has to evaluate all possible moves.  
-From these, the player $p$ will choose the move that maximizes the value of the game for herself.  In order to
-do so, the player $p$ computes the set 
-$\textts{nextStates}(s, p)$ of all states that can be reached from the state $s$ in any one move of the player $p$.
-Now if $n$ is a state that results from player $p$ making some move, then in state $n$ it is the turn of the other player
-$o$ to make a move.  Hence, in order to evaluate the state $n$, we have to call the function $\textts{value}$
-recursively as $\textts{value}(n,o)$.   Since the gains of the other player $o$ are the losses of the player
-$p$, we have to take the negative of  $\textts{value}(n, o)$.
-\myFig{Minimax.ipynb} shows an implementation of this strategy.
+The reason is that, if the game is not finished yet, the maximizing player $\textts{gPlayers}[0]$ has to
+evaluate all possible moves.   
+From these, the player will choose the move that maximizes the value of the game for herself.  In order to
+do so, the player computes the set 
+$\textts{nextStates}(s, \mathtt{gPlayers}[0])$ of all states that can be reached from the state $s$ in any one move of the player $\mathtt{gPlayers}[0]$.
+Now if $n$ is a state that results from player $\texttt{gPlayers}[0]$ making some move, then in state $n$ it is the turn of the other player
+$\mathtt{gPlayers}[1]$ to make a move.  However, this player is the minimizing player who tries to achieve the
+state with the minimal value.
+Hence, in order to evaluate the state $n$, we have to call the function $\textts{minValue}$
+recursively as $\textts{minValue}(n)$.
+The definition of the function \textts{minValue} is defined by the following recursive equations
+\begin{enumerate}
+\item $\textts{finished}(s) \rightarrow \textts{minValue}(s) = \textts{utility}(s)$. 
+\item $\neg \textts{finished}(s) \rightarrow 
+       \textts{minValue}(s) = \min\bigl(\bigl\{
+                     \textts{maxValue}(n) \bigm| n \in \textts{nextStates}(s, \mathtt{gPlayers}[1])
+                     \bigr\}\bigr)
+      $.  
+\end{enumerate}
+In the future we will sometimes speak of the \textts{value} function.  This name is used as a synonym for the
+function \textts{maxValue}. 
+
+
+\myFig{Minimax.ipynb} shows an implementation of the functions \textts{maxValue} and
+\textts{minValue}. It also shows the function \textts{best\_move}. 
+This function  takes a $\textts{State}$ such that \textts{X} is to move in this state.  It returns a pair
+$(v,s)$ where $s$ is a state that is optimal for the player \textts{X} and such
+that $s$ can be reached in one step from $\textts{State}$.  Furthermore, $v$ is the value of this state.
+\begin{enumerate}[(a)]
+\item To this end, it first computes the set $\textts{NS}$ of all states that can be reached 
+      from the given $\textts{State}$ in one step if \textts{X} is to move next.
+\item $\textts{bestValue}$ is the best value that $\textts{X}$ can achieve in the given $\textts{State}$.
+\item $\textts{BestMoves}$ is the set of states that  $\textts{X}$ can move to and that are optimal
+      for her.
+\item The function returns randomly one of those states $\textts{ns} \in \textts{NS}$ such that 
+      the value of $\textts{ns}$ is optimal, i.e.~is equal to $\textts{bestValue}$.
+      We use randomization here since we want to have more interesting games.  If we would always choose
+      the first state that achieves the best value, then our program would always make the same move in
+      a given state.  Hence, playing the program would get boring much sooner.
+\end{enumerate}
 
 
 \begin{figure}[!ht]
@@ -428,32 +455,20 @@ $p$, we have to take the negative of  $\textts{value}(n, o)$.
                 xleftmargin   = 0.0cm,
                 xrightmargin  = 0.0cm,
               ]{python3}
-    other = lambda p: [o for o in Players if o != p][0]
-    Cache = {}
-
-    def memoize(f):
-        global Cache
-
-        def f_memoized(*args):
-            if args in Cache:
-                return Cache[args]
-            result = f(*args)
-            Cache[args] = result
-            return result
-
-        return f_memoized
-  
-    @memoize    
-    def value(State, player):
+    def maxValue(State):
         if finished(State):
-            return utility(State, player)
-        o = other(player)
-        return max([-value(ns, o) for ns in next_states(State, player)])
+            return utility(State)
+        return max([ minValue(ns) for ns in next_states(State, gPlayers[0]) ])
     
-    def best_move(State, player):
-        NS        = next_states(State, player)
-        bestVal   = value(State, player)
-        BestMoves = [s for s in NS if -value(s, other(player)) == bestVal]
+    def minValue(State):  
+        if finished(State):
+            return utility(State)
+        return min([ maxValue(ns) for ns in next_states(State, gPlayers[1]) ])
+    
+    def best_move(State):
+        NS        = next_states(State, gPlayers[0])
+        bestVal   = maxValue(State)
+        BestMoves = [s for s in NS if minValue(s) == bestVal]
         BestState = random.choice(BestMoves)
         return bestVal, BestState
 \end{minted}
@@ -462,66 +477,87 @@ $p$, we have to take the negative of  $\textts{value}(n, o)$.
 \end{figure}
 \FloatBarrier
 
+\subsection{Memoization}
+Let us consider how many states have to be explored in the case of tic-tac-toe by the minimax algorithm
+described previously.  We have 9 possible moves for player \textts{X} in the start state, then the player
+\textts{O} can respect with 8 moves, then there are 7 moves for player \textts{O} and so on until in the end
+player \textts{X} has only $1$ move left.  If we disregard 
+the fact that some games are decided after fewer than 9 moves, the functions $\textts{maxValue}$ and
+$\textts{minValue}$ need to consider  a total of
+\\[0.2cm]
+\hspace*{1.3cm}
+$9 \cdot 8 \cdot 7 \cdot {\dots} \cdot 2 \cdot 1 = 9! = 362\,880$
+\\[0.2cm]
+different moves.  However, if we count the number of possibilities of putting 5 \textts{O}s and 4
+\textts{X}s on a $3 \times 3$ board, we see that there are only
+\\[0.2cm]
+\hspace*{1.3cm}
+$\ds {9 \choose 5} = \frac{9!}{5! \cdot 4!} = 126$
+\\[0.2cm]
+possibilities, because we only have to count the number of ways that there are to put 5 \textts{O}s on
+9 different positions and that number is the same as the number of subsets of five
+elements from a set of 9 elements. 
+Therefore, if we disregard the fact that some games are decided after fewer than nine moves,  there are a
+factor of $5! \cdot 4! = 2880$ less terminal states than there are possible sequences of moves!
+
+As we have to evaluate not just terminal states but all states, the saving is actually a bit smaller than
+$2880$.  The next exercise explores this in more detail.
+
+We can use \blue{memoization} \index{memoization} to exploit the fact that the number of states is much smaller
+than the number of possible game sequences. 
+\myFig{Minimax.ipynb-mem} shows how this can be implemented.
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                framesep      = 0.3cm, 
+                firstnumber   = 1,
+                bgcolor       = sepia,
+                numbers       = left,
+                numbersep     = -0.2cm,
+                xleftmargin   = 0.0cm,
+                xrightmargin  = 0.0cm,
+              ]{python3}
+    gCache = {}
+
+    def memoize(f):
+        global gCache
+
+        def f_memoized(*args):
+            if args in gCache:
+                return gCache[args]
+            result = f(*args)
+            gCache[args] = result
+            return result
+
+        return f_memoized
+  
+    maxValue = memoize(maxValue)
+    minValue = memoize(minValue)
+\end{minted}
+\caption{Memoization.}
+\label{fig:Minimax.ipynb-mem}
+\end{figure}
+\FloatBarrier
+
 \begin{enumerate}
-\item Given a player $\textts{p}$, the function $\textts{other}$ computes the other player,
-      which is the first element of the list $\textts{Players}$ that is different from $p$.
-      This works because we assume that there are just two players and these players are the two elements of
-      the list $\textts{Players}$ that has been defined in the notebook defining the game.
-\item $\textts{Cache}$ is a dictionary that is initially empty.  This dictionary is used as a memory cache by 
+\item $\textts{gCache}$ is a dictionary that is initially empty.  This dictionary is used as a memory cache by 
       the function $\textts{memoize}$.
-\item The function $\mathtt{memoize}$ is a second order function that takes a function $f$ as its argument.
+\item The function $\textts{memoize}$ is a second order function that takes a function $f$ as its argument.
       It creates a \href{https://en.wikipedia.org/wiki/Memoization}{memoized} version of the function $f$:
       This memoized version of $f$, which is called $\mathtt{f\_memoized}$, first tries to retrieve the value
-      of $f$ from the dictionary $\textts{Cache}$. 
-      If this is successful, the function returns the cached value.  Otherwise, the function $f$ is called
-      to compute the result.  This result is then stored in the $\mathtt{Cache}$ before it is returned.
-      The function $\mathtt{memoize}$ returns the memoized version of $f$.
+      of $f$ from the dictionary $\textts{gCache}$. 
+      If this is successful, the cached value is returned.  Otherwise, the function $f$ is called
+      to compute the result.  This result is then stored in the dictionary $\textts{gCache}$ before it is returned.
+      The function $\textts{memoize}$ returns the memoized version of $f$.
       \index{memoization}
-\item The implementation of the function $\textts{value}$ implements the formulas $(1)$ and $(2)$ that were
-      used to define the function $\mathtt{value}$ abstractly.
-      However, note that we have preceded the definition of the function $\textts{value}$ with the
-      \blue{decorator} \textts{@memoize}, which turns the function \textts{value} into a memoized function.
-      Hence, when the function $\textts{value}$ is called a
-      second time with the same pair of arguments, it does not recompute the value but rather the value is
-      looked up from the variable $\textts{Cache}$ that stores all previous results computed by the function $\textts{value}$.  To
-      understand why this is important, 
-      let us consider how many states would be explored in the case of tic-tac-toe if we would not use the idea
-      of memoizing previous results.  In this case, we have 9 moves for player
-      \textts{X} from the start state, then 8 moves for player \textts{O}, then 7 moves for
-      player \textts{O} and so on until in the end player \textts{X} has only $1$ move left.  If we disregard
-      the fact that some games are decided after fewer than 9 moves, the function $\textts{value}$ needs to consider 
-      \\[0.2cm]
-      \hspace*{1.3cm}
-      $9 \cdot 8 \cdot 7 \cdot {\dots} \cdot 2 \cdot 1 = 9! = 362\,880$
-      \\[0.2cm]
-      different moves.  However, if we count the number of possibilities of putting 5 ``\textts{O}''s and 4
-      ``\textts{X}''s on a $3 \times 3$ board, we see that there are only
-      \\[0.2cm]
-      \hspace*{1.3cm}
-      $\ds {9 \choose 5} = \frac{9!}{5! \cdot 4!} = 126$
-      \\[0.2cm]
-      possibilities, because we only have to count the number of ways to put 5 ``\textts{O}''s on
-      9 positions and that number is the same as the number of subsets of five elements from a set of nine elements.
-      Therefore, if we disregard the fact that some games are decided after fewer than nine moves,  there are a
-      factor of $5! \cdot 4! = 2880$ less terminal states to evaluate if we use memoization!
+\item All that needs to be done is then to memoize both the function $\textts{maxValue}$ and the function
+      $\textts{minValue}$.  In this case it is not a problem that these functions share the same dictionary
+      \textts{gCache} because  $\textts{maxValue}$ is only called for states where \textts{X} has to make the
+      next move, while  $\textts{minValue}$ is only called for states where \textts{O} has to make the
+      next move.  If this wouldn't be the case, the name of the function would have to be stored in
+      $\textts{gCache}$ also.
 
-      As we have to evaluate not just terminal states but all states, the saving is actually a bit smaller than
-      $2880$.  The next exercise explores this in more detail.
-\item The function $\textts{best\_move}$ takes a $\textts{State}$ and a $\textts{player}$ and returns a pair $(v,s)$
-      where $s$ is a state that is optimal for the $\textts{player}$ and such that $s$ can be reached in one step from
-      $\textts{State}$.  Furthermore, $v$ is the value of this state.
-      \begin{enumerate}[(a)]
-      \item To this end, it first computes the set $\textts{NS}$ of all states that can be reached 
-            from the given $\textts{State}$ in one step if $\textts{player}$ is to move next.
-      \item $\textts{bestValue}$ is the best value that $\textts{player}$ can achieve in the given $\textts{State}$.
-      \item $\textts{BestMoves}$ is the set of states that  $\textts{player}$ can move to and that are optimal
-            for her.
-      \item The function returns randomly one of those states $\textts{ns} \in \textts{NS}$ such that 
-            the value of $\textts{ns}$ is optimal, i.e.~is equal to $\textts{bestValue}$.
-            We use randomization here since we want to have more interesting games.  If we would always choose
-            the first state that achieves the best value, then our program would always make the same move in
-            a given state.  Hence, playing the program would get boring much sooner.
-      \end{enumerate}
 \end{enumerate}
 
 \begin{figure}[!ht]
@@ -536,10 +572,9 @@ $p$, we have to take the negative of  $\textts{value}(n, o)$.
                 xrightmargin  = 0.0cm,
               ]{python3}
     def play_game(canvas):
-        State = Start
-        while True:
-            firstPlayer = Players[0]
-            val, State  = best_move(State, firstPlayer);
+        State = gStart
+        while True: 
+            val, State = best_move(State);
             draw(State, canvas, f'For me, the game has the value {val}.')
             if finished(State):
                 final_msg(State)
@@ -561,22 +596,17 @@ $p$, we have to take the negative of  $\textts{value}(n, o)$.
 \begin{enumerate}
 \item Initially, $\textts{State}$ is the $\textts{startState}$.
 \item As long as the game is not finished, the procedure keeps running.
-\item We assume that the computer goes first and therefore define  \textts{firstPlayer} as the first
-      element of the list $\textts{Players}$.  Next, the function $\textts{best\_move}$ is used to
-      compute the state that results from the best move of $\textts{firstPlayer}$.
+\item We assume that the computer goes first.
+\item The function $\textts{best\_move}$ is used compute the move of the computer.
       This resulting state is then displayed.
 \item After that, it is checked whether the game is finished.
 \item If the game is not  yet finished, the user is asked to make his move via the function
       $\textts{get\_move}$. The state resulting from this move is then returned and displayed.
 \item Next, we have to check whether the game is finished after the  move of the user has been executed.
-\item The \textts{while}-loop keeps iterating until the game is finished.
-      We do not have to put a test into the condition of this \textts{while}-loop as we call the function
-      $\textts{finished}(\textts{State})$ every time that a new $\textts{State}$ has been reached.
-      If the game is finished, a message giving the result of the game is printed and the function returns.
 \end{enumerate}
 
-In order to better understand the reason for using memoization in the implementation of the function
-\textts{value} we introduce the following notion.
+In order to better understand the reason for using memoization in the implementation of the functions
+\textts{maxValue} and \textts{minValue} we introduce the following notion.
 \begin{Definition}[\blue{Game Tree}]
   Assume that
   \\[0.2cm]
@@ -593,19 +623,19 @@ In order to better understand the reason for using memoization in the implementa
   \hspace*{1.3cm}
   $p_i := \left\{
   \begin{array}[c]{ll}
-    \mathtt{Players[0]} & \mbox{if $i \;\%\; 2 = 0$;} \\
-    \mathtt{Players[1]} & \mbox{if $i \;\%\; 2 = 1$.}
+    \textts{Players[0]} & \mbox{if $i \;\texttt{\%}\; 2 = 0$;} \\
+    \textts{Players[1]} & \mbox{if $i \;\texttt{\%}\; 2 = 1$.}
   \end{array}
   \right.
   $
   \\[0.2cm]
-  Therefore,  $p_i$ is the first element in the list $\textts{Players}$ if $i$ is even and
-  $p_i$ is the second element if $i$ is odd.  The \blue{game tree} of the game $\mathcal{G}$ is the set of all
+  Therefore,  $p_i$ is the first element of the list $\textts{Players}$ if $i$ is even and
+  $p_i$ is the second element of this list if $i$ is odd.  The \blue{game tree} of the game $\mathcal{G}$ is the set of all
   possible plays.  \eoxs 
 \end{Definition}
 
 \noindent
-The following exercise shows why memoization is important.
+The following exercise shows why memoization is so important.
 
 \exercise
 In \blue{simplified tic-tac-toe} the game only ends when there are no more empty squares left.
@@ -620,60 +650,77 @@ or diagonals of three \textts{X}s.  Otherwise, the game is a draw.
 
       \textbf{Notice} that this question does not ask for the number of all terminal states but rather asks for
       all states. 
-\item Write a short program to evaluate the formula derived in part (c) of this exercise.
+\item Evaluate the formula derived in part (c) of this exercise.
+      
+      \textbf{Hint}: You don't have to do the calculation in your head.
       \eox
 \end{enumerate}
 
 \section{Alpha-Beta Pruning}
 In this section we discuss \href{https://en.wikipedia.org/wiki/Alpha-beta_pruning}{$\alpha$-$\beta$-Pruning}.
 This is a search technique that can prune large numbers of the search space and thereby increase the efficiency
-of a game playing program.  The basic idea is to provide two additional arguments to the function
-$\textts{value}$.  Traditionally, these arguments are called $\blue{\alpha}$ and $\blue{\beta}$.  In order to be able to
-distinguish between the old function $\textts{value}$ and its improved version, we call the improved version 
-$\textts{alphaBeta}$.  The idea is that the function $\textts{alphaBeta}$ and the function $\textts{value}$ are
+of a game playing program.  The basic idea is to provide two additional arguments to the functions
+$\textts{maxValue}$ and $\textts{minValue}$.  Traditionally, these arguments are called $\blue{\alpha}$ and $\blue{\beta}$.  In order to be able to
+distinguish between the old functions $\textts{maxValue}$ and  $\textts{minValue}$ and its
+improved version, we call the improved versions  
+$\textts{alphaBetaMax}$ and $\textts{alphaBetaMin}$.  The idea is that these functions are
 related by the following requirements: 
 \begin{enumerate}
-\item As long as $\textts{value}(s, p)$ is between $\alpha$ and $\beta$, the function
-      $\textts{alphaBeta}$ computes the same result as the function $\textts{value}$,
+\item As long as $\textts{maxValue}(s)$ is between $\alpha$ and $\beta$, the function
+      $\textts{alphaBetaMax}$ computes the same result as the function $\textts{maxValue}$,
       i.e.~we have
       \\[0.2cm]
       \hspace*{0.3cm}
-      $\alpha \leq \textts{value}(s, p) \leq \beta \;\rightarrow\;
-         \textts{alphaBeta}(s, p, \alpha, \beta) = \textts{value}(s,p)
+      $\alpha \leq \textts{maxValue}(s) \leq \beta \;\rightarrow\;
+         \textts{alphaBetaMax}(s, \alpha, \beta) = \textts{maxValue}(s)
       $.
-\item If $\textts{value}(s, p) < \alpha$, we require that the value returned by
-      $\textts{alphaBeta}$ is less than or equal to $\alpha$, i.e.~we have 
+\item If $\textts{maxValue}(s) < \alpha$, we require that the value returned by
+      $\textts{alphaBetaMax}$ is less than or equal to $\alpha$, i.e.~we have 
       \\[0.2cm]
       \hspace*{0.3cm}
-      $\textts{value}(s, p) < \alpha \;\rightarrow\; \textts{alphaBeta}(s, p, \alpha, \beta) \leq \alpha$.
-\item Similarly, if $\textts{value}(s, p) > \beta$, we require that the value
-      returned by $\textts{valueAlphaBeta}$ is bigger than or equal to $\beta$, i.e.~we have 
+      $\textts{maxValue}(s) < \alpha \;\rightarrow\; \textts{alphaBetaMax}(s, \alpha, \beta) \leq \alpha$.
+\item Similarly, if $\textts{maxValue}(s) > \beta$, we require that the value
+      returned by $\textts{AlphabetaMax}$ is bigger than or equal to $\beta$, i.e.~we have 
       \\[0.2cm]
       \hspace*{0.3cm}
-      $\beta < \textts{value}(s, p) \;\rightarrow\; \beta \leq \textts{alphaBeta}(s, p, \alpha, \beta)$.
+      $\beta < \textts{maxValue}(s) \;\rightarrow\; \beta \leq \textts{alphaBetaMax}(s, \alpha, \beta)$.
 \end{enumerate}
-Therefore, $\textts{alphaBeta}(\textts{State}, \textts{player})$  is only an \blue{approximation} of
-$\textts{value}(\textts{State}, \textts{player})$.  However, it turns out that this approximation is all that
-is needed.  \myFig{Alpha-Beta-Pruning.ipynb:alphaBeta} shows an implementation of the function $\textts{alphaBeta}$ that
-satisfies the specification given above.  Once the function $\textts{alphaBeta}$ is implemented, the function
-$\textts{value}$ can then be computed as 
+Similar to the way that the function \textts{maxValue} is approximated by the function \textts{alphaBetaMax},
+the function \textts{minValue} is approximated by the function \textts{alphaBetaMin}.  We have: 
+\begin{enumerate}
+\item $\alpha \leq \textts{minValue}(s) \leq \beta \;\rightarrow\;
+         \textts{alphaBetaMin}(s, \alpha, \beta) = \textts{minValue}(s)
+      $.
+\item $\textts{minValue}(s) < \alpha \;\rightarrow\; \textts{alphaBetaMin}(s, \alpha, \beta) \leq \alpha$.
+\item $\beta < \textts{minValue}(s) \;\rightarrow\; \beta \leq \textts{alphaBetaMin}(s, \alpha, \beta)$.
+\end{enumerate}
+Although $\textts{alphaBetaMax}(s)$and $\textts{alphaBetaMin}(s)$  are only \blue{approximations} of
+$\textts{maxValue}(s)$ and $\textts{minValue}(s)$, it turns out that these approximations are all that
+is needed.  Once the function $\textts{alphaBetaMax}$ is implemented, the function
+$\textts{maxValue}$ can then be computed as 
 \\[0.2cm]
 \hspace*{1.3cm}
-$\textts{value}(s, p ) := \textts{alphaBeta}(s, p, -1, +1)$.
+$\textts{maxValue}(s) := \textts{alphaBetaMax}(s, -1, +1)$.
 \\[0.2cm]
-The reason is that we already know that $-1 \leq \textts{value}(s,p) \leq +1$ and hence the first case of the
-specification of $\textts{alphaBeta}$ guarantees that the equation
+The reason is that we already know that $-1 \leq \textts{maxValue}(s) \leq +1$ and hence the first case of the
+specification of $\textts{alphaBetaMax}$ guarantees that the equation
 \\[0.2cm]
 \hspace*{1.3cm}
-$\textts{value}(s,p) = \textts{alphaBeta}(s,p,-1,+1)$
+$\textts{maxValue}(s) = \textts{alphaBetaMax}(s,-1,+1)$
 \\[0.2cm]
-holds.  Since $\textts{alphaBeta}$ is implemented as a recursive procedure, 
-the fact that the implementation of $\textts{alphaBeta}$ shown in \myFig{Alpha-Beta-Pruning.ipynb:alphaBeta} satisfies the
-specification given above can be established by computational induction.  A proof by computational induction
-can be found in an
-\href{https://pdfs.semanticscholar.org/dce2/6118156e5bc287bca2465a62e75af39c7e85.pdf}{article} by Donald
+holds.  Similarly, the function $\textts{minValue}$ can be computed as 
+\\[0.2cm]
+\hspace*{1.3cm}
+$\textts{minValue}(s) := \textts{alphaBetaMin}(s, -1, +1)$.
+\\[0.2cm]
+\myFig{Alpha-Beta-Pruning.ipynb:alphaBeta} shows an implementation of the functions $\textts{alphaBetaMax}$ and
+$\textts{alphaBetaMin}$ that satisfies the specification given above.
+Since $\textts{alphaBetaMax}$ and $\textts{alphaBetaMin}$ are implemented as mutually recursive functions, 
+the fact that the implementations of $\textts{alphaBetaMax}$ and \textts{alphaBetaMin}
+satisfy the specifications given above can be established by computational induction.  A proof 
+can be found in the
+\href{https://pdfs.semanticscholar.org/dce2/6118156e5bc287bca2465a62e75af39c7e85.pdf}{article} by Donald 
 E.~Knuth and Ronald W.~Moore \cite{knuth:1975}. 
-
 
 
 \begin{figure}[!ht]
@@ -687,16 +734,31 @@ E.~Knuth and Ronald W.~Moore \cite{knuth:1975}.
                 xleftmargin   = 0.0cm,
                 xrightmargin  = 0.0cm,
               ]{python3}
-    def alphaBeta(State, player, alpha, beta):
+    def alphaBetaMax(State, alpha, beta):
         if finished(State):
-            return utility(State, player)
-        val = alpha
-        for ns in next_states(State, player):
-            val = max(val, -value(ns, other(player), -beta, -alpha))
-            if val >= beta:
-                return val
-            alpha = max(val, alpha)
-        return val
+            return utility(State)
+        if alpha >= beta:
+            return alpha
+        value = alpha
+        for ns in next_states(State, gPlayers[0]):
+            value = max(value, alphaBetaMin(ns, alpha, beta))
+            if value >= beta:
+                return value
+            alpha = max(value, alpha)
+        return value
+    
+    def alphaBetaMin(State, alpha, beta):
+        if finished(State):
+            return utility(State)
+        if beta <= alpha:
+            return beta
+        value = beta
+        for ns in next_states(State, gPlayers[1]):
+            value = min(value, alphaBetaMax(ns, alpha, beta))
+            if value <= alpha:
+                return value
+            beta = min(value, beta)
+        return value    
 \end{minted}
 \caption{$\alpha$-$\beta$-Pruning.}
 \label{fig:Alpha-Beta-Pruning.ipynb:alphaBeta}
@@ -704,42 +766,171 @@ E.~Knuth and Ronald W.~Moore \cite{knuth:1975}.
 \FloatBarrier
 
 \noindent
-We proceed to discuss the implementation of the function $\textts{alphaBeta}$, which is shown in
+We proceed to discuss the implementation of the function $\textts{alphaBetaMax}$, which is shown in
 \myFig{Alpha-Beta-Pruning.ipynb:alphaBeta}.
 \begin{enumerate}
 \item If $\textts{State}$ is a terminal state, the function returns the $\textts{utility}$ of the given
-      $\textts{State}$ with respect to $\textts{player}$.
-\item The variable $\textts{val}$ is supposed to store the maximum of the values of all states
-      that can be reached from the given $\textts{State}$ if $\textts{player}$ makes one move.
+      $\textts{State}$.
+\item If $\textts{alpha} > \textts{beta}$, the function returns the lower bound $\textts{alpha}$.
+      In this case, we know that we can not have $\alpha \leq \textts{maxValue}(s) \leq \beta$.
+      Instead, we have either $\alpha \leq \textts{maxValue}(s)$ or $\textts{maxValue}(s) < \alpha$.
+      We analyse these cases separately.
+      \begin{enumerate}[(a)]
+      \item $\alpha \leq \textts{maxValue}(s)$
+
+            Then, because $\beta < \alpha$ we also have $\beta < \textts{maxValue}(s)$ and
+            we have
+            \\[0.2cm]
+            \hspace*{1.3cm}
+            $\beta \leq \alpha = \textts{alphaBetaMax}(s)$,
+            \\[0.2cm]
+            as required.
+      \item $\textts{maxValue}(s) < \alpha$.  As we have
+            \\[0.2cm]
+            \hspace*{1.3cm}
+            $\textts{alphaBetaMax}(s) = \alpha \leq \alpha$
+            \\[0.2cm]
+            the specification is again satisfied.
+      \end{enumerate}
+\item The case $\alpha = \beta$ is similar to the case above.
+      However, in that case we also have to deal with the case that $\alpha = \textts{maxValue}(s) = \beta$.
+      However, since then $\textts{alphaBetaMax}(s) = \alpha = \textts{maxValue}(s)$, this subcase is trivial.
+\item The variable $\textts{value}$ is supposed to store the maximum of the values of all states
+      that can be reached from the given $\textts{State}$.
       
-      According to the specification of $\textts{alphaBeta}$,  we are not interested in values that are less than
-      $\textts{alpha}$.  Hence, it suffices to initialize $\textts{val}$ with $\textts{alpha}$.   This way, in the case that we have
+      According to the specification of $\textts{alphaBetaMax}$,  we are not interested in values that are less than
+      $\textts{alpha}$.  Hence, it suffices to initialize $\textts{value}$ with $\textts{alpha}$.   This way, in the case that we have
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\textts{value}(\textts{State},\textts{player}) < \alpha$,
+      $\textts{maxValue}(\textts{State}) < \alpha$,
       \\[0.2cm]
       instead of returning the true value of the given $\textts{State}$, the function
-      $\textts{alphaBeta}(\textts{State},\textts{player},\alpha,\beta)$ will instead return the value $\alpha$, which is permitted by its specification.
-\item Next, we iterate over all successor states $\textts{ns} \in \textts{next\_states}(\textts{State}, \textts{player})$.
-\item We have to recursively evaluate the states $\textts{ns}$ with respect to the opponent  $\textts{other}(\textts{player})$.
-      Since the value of a state for the opponent is the negative of the value for
-      $\textts{player}$, we have to exchange the roles of $\alpha$ and $\beta$ and prefix them with a negative
-      sign.  Note that in the recursive call we do not call the function $\mathtt{alphaBeta}$ directly, but
-      rather we call the function $\mathtt{value}$.  This function is a wrapper for the function
-      $\mathtt{alphaBeta}$.  The purpose of this wrapper is to \blue{memoize} the function
-      $\mathtt{alphaBeta}$.  This is more complicated now due to the presence of the parameters $\alpha$ and $\beta$.
-      The details will be explained below when we discuss the function $\textts{value}$ that is shown in Figure
-      \ref{fig:Alpha-Beta-Pruning.ipynb:value}.
-\item As the specification of $\textts{alphaBeta}$ ask us to compute the value of $\textts{State}$ only in
+      $\textts{alphaBeta}(\textts{State},\alpha,\beta)$ will instead return the value $\alpha$, which is permitted by its specification.
+\item Next, we iterate over all successor states $\textts{ns} \in \textts{next\_states}(\textts{State}, \textts{gPlayers}[0])$.
+\item We have to recursively evaluate the states $\textts{ns}$ with respect to the minimizing player \textts{gPlayers[1]}.
+\item As the specification of $\textts{alphaBetaMax}$ ask us to compute the value of $\textts{State}$ only in
       those cases where it is less than or equal to $\beta$, once we find a successor state $s$ that has a
-      value $\textts{val}$ that is at least as big as $\beta$ we can \blue{stop any further evaluation} of the successor
-      states and return the value $\textts{val}$.
+      value $\textts{value}$ that is at least as big as $\beta$ we can \blue{stop any further evaluation} of the successor
+      states and return the value $\textts{value}$.
 
-      \underline{In }p\underline{ractice},\underline{ this shortcut results in si}g\underline{nificant savin}g\underline{s of com}p\underline{utation time!}
-\item Once we have found a successor state that has a value $\textts{val}$ greater than $\textts{alpha}$,
-      we can increase $\textts{alpha}$ to the value $\textts{val}$.  The reason is, that once we know we can
-      achieve a value of $\textts{val}$ we are no longer interested in any values that are less than $\textts{val}$.
-      This is the reason for assigning to $\textts{alpha}$ the maximum of $\textts{val}$ and $\textts{alpha}$.
+      This shortcut results in significant savings of computation time!
+\item Once we have found a successor state that has a value $\textts{value}$ greater than $\textts{alpha}$,
+      we can increase $\textts{alpha}$ to the value $\textts{value}$.  The reason is, that once we know we can
+      achieve a value of $\textts{value}$ we are no longer interested in any values that are less than $\textts{value}$.
+      This is the reason for assigning the maximum of $\textts{value}$ and $\textts{alpha}$ to $\textts{alpha}$.
+\end{enumerate}
+
+\remark
+There is a nice simulator for alpha-beta-pruning available at the following web address:
+\href{https://www.usama.dev/minimax-simulator}{https://www.usama.dev/minimax-simulator}.
+
+\subsection{Alpha-Beta-Pruning with Memoization}
+Adding memoization to the functions \textts{maxValue} and \textts{minValue} is non-trivial.
+If memoization is added in a naive way, then the cache might have many entries for the same state that differ
+only in their values for the parameters $\alpha$ and $\beta$.  Although this is not a problem for trivial games
+like Tic-Tac-Toe, it becomes a problem once we try to implement more complex games like
+\href{https://en.wikipedia.org/wiki/Connect_Four}{Connect Four}. The reason is that for those games we are no
+longer able to compute the complete game tree.  Instead, we need to approximate the value of a state with the
+help of a heuristic.  Then, $\alpha$ and $\beta$ will no longer be confined to the values from the set
+$\{-1,0,1\}$ and hence there will be many function calls of the form
+\\[0.2cm]
+\hspace*{1.3cm}
+$\textts{maxValue}(s, \alpha, \beta)$ 
+\\[0.2cm]
+where the state $s$ is the same but $\alpha$ and $\beta$ are different.  If we would try to store every
+combination of $s$, $\alpha$, and $\beta$ we would waste a lot of memory and, furthermore, we would have only a
+small number of cache hits.  Therefore, we will now present a more effective way to cache the functions
+\textts{maxValue} and \textts{minValue}.  To this end we will define a function \textts{evaluate} that is
+called as follows:
+\\[0.2cm]
+\hspace*{1.3cm}
+$\textts{evaluate}(s, f, \alpha, \beta)$
+\\[0.2cm]
+where the parameters are interpreted as follows:
+\begin{enumerate}[(a)]
+\item $s$ is a state that is to be evaluated.
+\item $f$ is either the function \textts{maxValue} or the function \textts{minValue}.
+      If in state $s$ the first player has to move, then $f = \textts{alphaBetaMax}$, otherwise we have
+      $f = \textts{alphaBetaMin}$.
+\item We interpret the parameters $\alpha$ and $\beta$ in the same way as we did when we used them with
+      the functions $\textts{alphaBetaMax}$ and $\textts{alphaBetaMin}$.
+\end{enumerate}
+The function \textts{evaluate} makes use of a global variable \textts{gCache}.  This variable is used as a
+cache to store the results of the function \textts{evaluate}.  This cache is implemented as a dictionary.  The
+keys of this dictionary are the states, not triples of the form $\langle s, \alpha, \beta \rangle$.  The values
+that are stored a pairs of the form $\langle \textts{flag}, v \rangle$, where $v$ is a value computed by the
+function $\textts{evaluate}(s, f, \alpha, \beta)$, while $\textts{flag} \in \{ \quoted{\leq}, \quoted{=}, \quoted{\geq}\}$.
+The cache satisfies the following specification:
+\begin{enumerate}
+\item $\texttt{gCache[State]} = (\quoted{=}, v) \rightarrow \texttt{evaluate(State)} = v$,
+
+      i.e.~if the flag is equal to \quoted{=}, then the value stored in \textts{gCache[State]}
+      is the exact value of the given \textts{State}.
+\item $\texttt{gCache[State]} = (\quoted{\leq}, v) \rightarrow \texttt{evaluate(State)} \leq v$,
+
+      i.e.~if the flag is equal to \quoted{\leq}, then the value stored in \textts{gCache[State]}
+      is an upper bound for \textts{evaluate(State)}.
+
+\item $\texttt{gCache[State]} = (\quoted{\geq}, v) \rightarrow \texttt{evaluate(State)} \geq v$,
+
+      i.e.~if the flag is equal to \quoted{\geq}, then the value stored in \textts{gCache[State]}
+      is a lower bound for \textts{evaluate(State)}.
+\end{enumerate}
+If \textts{gCache[State]} is defined, then the computation of `evaluate(State, alpha, beta)`
+proceeds according to the following case distinction:
+\begin{enumerate}
+\item If the stored value $v$ is exact, we can return this value:
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      $\texttt{gCache[State]} = (\quoted{=}, v) \rightarrow \texttt{evaluate}(\texttt{State}, \alpha, \beta) = v$.
+\item If the stored value $v$ is an upper bound and this upper bound is less or equal than $\alpha$, then we know that
+      the true value of \textts{State} is less or equal than $\alpha$ and hence we can also return the value $v$:
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      $\texttt{gCache[State]} = (\quoted{\leq}, v) \wedge v \leq \alpha \rightarrow 
+     \texttt{evaluate}(\texttt{State}, \alpha, \beta) = v$.
+\item If the stored value $v$ is an upper bound and this upper bound is bigger than $\alpha$ but less than
+      $\beta$, then we know that the true value is less or equal than $v$ and hence we shrink the interval
+      $[\alpha, \beta]$ into the interval $[\alpha, v]$.
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      $\texttt{gCache[State]} = (\quoted{\leq}, v) \wedge \alpha < v < \beta \rightarrow 
+     \texttt{evaluate}(\texttt{State}, \alpha, \beta) = f(\texttt{State}, \alpha, v)$.
+     
+      In this case, \textts{gCache} is updated.  
+
+\item If the stored value $v$ is an upper bound and this upper bound is bigger or equal than $\beta$, then the
+      stored value isn't of any help. 
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      $\texttt{gCache[State]} = (\quoted{\leq}, v) \wedge \beta \leq v \rightarrow 
+     \texttt{evaluate}(\texttt{State}, \alpha, \beta) = f(\texttt{State}, \alpha, \beta)$.
+
+      In this case,  \textts{gCache} needs to be updated.
+
+\item If the stored value $v$ is a lower bound and this lower bound is greater or equal than $\beta$, then we 
+      know that the true value is bigger or equal than $\beta$ and hence we can return the value $v$: 
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      $\texttt{gCache[State]} = (\quoted{\geq}, v) \wedge \beta \leq v \rightarrow 
+     \texttt{evaluate}(\texttt{State}, \alpha, \beta) = v$.
+\item If the stored value $v$ is a lower bound and this lower bound is less than $\beta$ but bigger than $\alpha$,
+      then we know that the true value is bigger or equal than $v$ and hence we shrink the interval $[\alpha,\beta]$
+      into the interval $[v, \beta]$: 
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      $\texttt{gCache[State]} = (\quoted{\geq}, v) \wedge \alpha < v < \beta \rightarrow 
+     \texttt{evaluate}(\texttt{State}, \alpha, \beta) = f(\texttt{State}, v, \beta)$.
+     
+      In this case, \textts{gCache} is updated.    
+\item If the stored value $v$ is a lower bound and this lower bound is less or equal than $\alpha$, then the
+      stored value isn't of any help. 
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      $\texttt{gCache[State]} = (\quoted{\geq}, v) \wedge v \leq \alpha \rightarrow 
+      \texttt{evaluate}(\texttt{State}, \alpha, \beta) = f(\texttt{State}, \alpha, \beta)$.
+
+      In this case, the \textts{gCache} needs to be updated.
 \end{enumerate}
 
 \begin{figure}[!ht]
@@ -750,91 +941,97 @@ We proceed to discuss the implementation of the function $\textts{alphaBeta}$, w
                 bgcolor       = sepia,
                 numbers       = left,
                 numbersep     = -0.2cm,
-                xleftmargin   = 0.8cm,
-                xrightmargin  = 0.8cm,
+                xleftmargin   = 0.0cm,
+                xrightmargin  = 0.0cm,
               ]{python3}
-    def value(State, player, alpha=-1, beta=1):
-        global Cache
-        if State in Cache:
-            val, a, b = Cache[State]
-            if a <= alpha and beta <= b:
-                return val
-            else:
-                alpha = min(alpha, a)
-                beta  = max(beta , b)
-                val   = alphaBeta(State, player, alpha, beta)
-                Cache[State] = val, alpha, beta
-                return val
-        else:
-            val = alphaBeta(State, player, alpha, beta)
-            Cache[State] = val, alpha, beta
-            return val                
+    def evaluate(State, f, alpha=-1, beta=1):
+        global gCache
+        if State in gCache:
+            flag, v = gCache[State]
+            if flag == '=':
+                return v
+            if flag == '<=':
+                if v <= alpha:
+                    return v
+                elif alpha < v < beta:
+                    w = f(State, alpha, v)
+                    store_cache(State, alpha, v, w)
+                    return w
+                else: 
+                    w = f(State, alpha, beta)
+                    store_cache(State, alpha, beta, w)
+                    return w
+            if flag == '>=':
+                if beta <= v:
+                    return v
+                elif alpha < v < beta:
+                    w = f(State, v, beta)
+                    store_cache(State, v, beta, w)
+                    return w
+                else:
+                    w = f(State, alpha, beta)
+                    store_cache(State, alpha, beta, w)
+                    return w
+        else: # no value stored in gCache for State
+            v = f(State, alpha, beta)
+            store_cache(State, alpha, beta, v)
+            return v
+
+    def store_cache(State, alpha, beta, v):
+        global gCache
+        if   v <= alpha:
+            gCache[State] = ('<=', v)
+        elif v <  beta: # alpha < v
+            gCache[State] = ('=', v)
+        else: # beta <= v
+            gCache[State] = ('>=', v)            
 \end{minted}
-\caption{The function $\mathtt{value}$ that memoizes the function $\mathtt{alphaBeta}$.}
-\label{fig:Alpha-Beta-Pruning.ipynb:value}
+\vspace*{-0.3cm}
+\caption{Implementation of the function \texttt{evaluate}.}
+\label{fig:evaluate}
 \end{figure}
 \FloatBarrier
 
-The function $\textts{value}$ shown in Figure \ref{fig:Alpha-Beta-Pruning.ipynb:value} is merely a wrapper of
-the function $\mathtt{alphaBeta}$ that memoizes the results of $\mathtt{alphaBeta}$.  This is more complicated
-now because of the parameters $\alpha$ and $\beta$.  Of course, we could just use the decorator
-\textts{\@memoize}.  The problem with this approach is that the function $\mathtt{alphaBeta}$ might be called
-with the same value for its parameters $\mathtt{State}$ and $\mathtt{player}$, but different values for the
-parameters $\mathtt{alpha}$ and $\mathtt{beta}$.  This would have two consequences:
-\begin{enumerate}
-\item The directory $\mathtt{Cache}$ would require much more memory as there are many more combinations of the parameters
-      of the function $\textts{alphaBeta}$ then there had been combinations for the function $\mathtt{value}$ when
-      we had implemented the minimax algorithm.  
-\item The directory $\textts{Cache}$ would become much less useful than in our implementation of the minimax
-      algorithm because we would have many cache misses.  
-\end{enumerate}
-The solution is to ensure that any $\mathtt{State}$ is stored at most once in $\mathtt{Cache}$.  But instead of storing just the
-value, we also have to store the values of the parameters $\mathtt{alpha}$ and $\mathtt{beta}$ that have been
-used to compute the value of the given $\mathtt{State}$, i.e.~we now have
-\\[0.2cm]
-\hspace*{1.3cm}
-$\mathtt{Cache}[\mathtt{State}] = (\mathtt{value}, \mathtt{alpha}, \mathtt{beta})$
-\\[0.2cm]
-if we have computed that
-\\[0.2cm]
-\hspace*{1.3cm}
-$\mathtt{alphaBeta}(\mathtt{State}, \mathtt{player}, \mathtt{alpha}, \mathtt{beta}) = \mathtt{value}$.
-\\[0.2cm]
-It turns out that there is no need to store the argument $\mathtt{player}$ since in the games that we consider
-this information can always be computed from the $\mathtt{State}$.
-
-Now the crucial idea of our implementation the function $\mathtt{value}$ is the following:  If we ever want to
-compute 
-\\[0.2cm]
-\hspace*{1.3cm}
-$\mathtt{alphaBeta}(\mathtt{State}, \mathtt{player}, \mathtt{alpha}, \mathtt{beta})$
-\\[0.2cm]
-and we have that 
-\\[0.2cm]
-\hspace*{1.3cm}
-$\mathtt{Cache}[\mathtt{State}] = (\mathtt{value}, a, b)$,
-\\[0.2cm]
-then we have to check whether the interval $[a,b]$ is \blue{more general} than the
-interval $[\mathtt{alpha}, \mathtt{beta}]$, i.e.~we have to check that
-\\[0.2cm]
-\hspace*{1.3cm}
-$a \leq \mathtt{alpha}$ \quad and \quad $\mathtt{beta} \leq b$ 
-\\[0.2cm]
-holds.  In this case we know that indeed
-\\[0.2cm]
-\hspace*{1.3cm}
-$\mathtt{alphaBeta}(\mathtt{State}, \mathtt{player}, \mathtt{alpha}, \mathtt{beta}) = \mathtt{value}$
-\\[0.2cm]
-and hence we can use the value stored in the $\mathtt{Cache}$.  If the inequations $a \leq \mathtt{alpha}$ and
-$\mathtt{beta} \leq b$  are not satisfied, then we compute
-\\[0.2cm]
-\hspace*{1.3cm}
-$\mathtt{alphaBeta}(\mathtt{State}, \mathtt{player}, \min(\mathtt{alpha}, a), \max(\mathtt{beta}, b))$
-\\[0.2cm]
-and store the resulting value together with the new interval $[\min(\mathtt{alpha}, a), \max(\mathtt{beta},
-b)]$ in the $\mathtt{Cache}$. 
-This way, the value stored in the $\mathtt{Cache}$ is more general than the previous value stored and we can
-expect more cache hits later.
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                framesep      = 0.3cm, 
+                firstnumber   = 1,
+                bgcolor       = sepia,
+                numbers       = left,
+                numbersep     = -0.2cm,
+                xleftmargin   = 0.0cm,
+                xrightmargin  = 0.0cm,
+              ]{python3}
+    def alphaBetaMax(State, alpha, beta):
+        if finished(State):
+            return utility(State)
+        if alpha >= beta:
+            return alpha
+        v = alpha
+        for ns in next_states(State, gPlayers[0]):
+            v = max(v, evaluate(ns, alphaBetaMin, v, beta))
+            if v >= beta:
+                return v
+        return v
+    
+    def alphaBetaMin(State, alpha, beta):
+        if finished(State):
+            return utility(State)
+        if beta <= alpha:
+            return beta
+        v = beta
+        for ns in next_states(State, gPlayers[1]):
+            v = min(v, evaluate(ns, alphaBetaMax, alpha, v))
+            if v <= alpha:
+                return v
+        return v
+\end{minted}
+\vspace*{-0.3cm}
+\caption{Cached implementation of the functions \texttt{alphaBetaMax} and \texttt{alphaBetaMin}.}
+\label{fig:alphaBetaCached}
+\end{figure}
+\FloatBarrier
 
 \section{Depth Limited Search}
 In practice, most games are far too complex to be evaluated completely, i.e.~the size of the set
@@ -892,10 +1089,10 @@ the given $\textts{State}$ using our \blue{evaluation function}.  This leads to 
 \FloatBarrier
 
 When we compare this Figure with \myFig{Alpha-Beta-Pruning.ipynb:alphaBeta}, the only difference is in line 4
-where we test whether the $\mathtt{limit}$ is $0$.  In this case, instead of trying to recursively evaluate the
-states reachable from $\mathtt{State}$, we evaluate the $\mathtt{State}$ with our $\mathtt{heuristic}$ function.
+where we test whether the $\textts{limit}$ is $0$.  In this case, instead of trying to recursively evaluate the
+states reachable from $\textts{State}$, we evaluate the $\textts{State}$ with our $\textts{heuristic}$ function.
 Later in the recursive calls of the function \textts{value} we have to take care to decrease the parameter
-$\mathtt{limit}$.
+$\textts{limit}$.
 
 For a game like tic-tac-toe it is difficult to come up with a decent heuristic.  A very crude approach would be
 to define:
