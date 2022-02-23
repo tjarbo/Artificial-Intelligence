@@ -385,7 +385,7 @@ states, the value is defined for all states.  Formally, we define a function
 \hspace*{1.3cm}
 $\textts{maxValue}: \textts{States} \rightarrow \{-1, 0, +1\}$
 \\[0.2cm]
-that takes a state $s \in \textts{States}$ returns the value that the state $s$ has for the first player, who
+that takes a state $s \in \textts{States}$ and returns the value that the state $s$ has for the first player, who
 tries to maximize the value of the state, provided that both the player $p$ and his opponent play
 \blue{optimally}.  The easiest way to define this function is via recursion.  As the 
 \textts{maxValue} function is an extension of the \textts{utility} function, the base case is as follows:
@@ -398,7 +398,7 @@ If the game is not yet finished, we define
 \hspace*{0.3cm}
 $\neg \textts{finished}(s) \rightarrow 
  \textts{maxValue}(s) = \max\bigl(\bigl\{
-                     \textts{valueMin}(n) \bigm| n \in \textts{nextStates}(s, \mathtt{gPlayers}[0])
+                     \textts{minValue}(n) \bigm| n \in \textts{nextStates}(s, \mathtt{gPlayers}[0])
                      \bigr\}\bigr)
 $.  \hspace*{\fill} (2)
 \\[0.2cm]
@@ -412,7 +412,7 @@ $\mathtt{gPlayers}[1]$ to make a move.  However, this player is the minimizing p
 state with the minimal value.
 Hence, in order to evaluate the state $n$, we have to call the function $\textts{minValue}$
 recursively as $\textts{minValue}(n)$.
-The definition of the function \textts{minValue} is defined by the following recursive equations
+The function \textts{minValue} has the same signature as \textts{maxValue} and is defined by the following recursive equations
 \begin{enumerate}
 \item $\textts{finished}(s) \rightarrow \textts{minValue}(s) = \textts{utility}(s)$. 
 \item $\neg \textts{finished}(s) \rightarrow 
@@ -680,7 +680,7 @@ related by the following requirements:
       \hspace*{0.3cm}
       $\textts{maxValue}(s) < \alpha \;\rightarrow\; \textts{alphaBetaMax}(s, \alpha, \beta) \leq \alpha$.
 \item Similarly, if $\textts{maxValue}(s) > \beta$, we require that the value
-      returned by $\textts{AlphabetaMax}$ is bigger than or equal to $\beta$, i.e.~we have 
+      returned by $\textts{alphaBetaMax}$ is bigger than or equal to $\beta$, i.e.~we have 
       \\[0.2cm]
       \hspace*{0.3cm}
       $\beta < \textts{maxValue}(s) \;\rightarrow\; \beta \leq \textts{alphaBetaMax}(s, \alpha, \beta)$.
@@ -737,8 +737,6 @@ E.~Knuth and Ronald W.~Moore \cite{knuth:1975}.
     def alphaBetaMax(State, alpha, beta):
         if finished(State):
             return utility(State)
-        if alpha >= beta:
-            return alpha
         value = alpha
         for ns in next_states(State, gPlayers[0]):
             value = max(value, alphaBetaMin(ns, alpha, beta))
@@ -750,8 +748,6 @@ E.~Knuth and Ronald W.~Moore \cite{knuth:1975}.
     def alphaBetaMin(State, alpha, beta):
         if finished(State):
             return utility(State)
-        if beta <= alpha:
-            return beta
         value = beta
         for ns in next_states(State, gPlayers[1]):
             value = min(value, alphaBetaMax(ns, alpha, beta))
@@ -771,30 +767,6 @@ We proceed to discuss the implementation of the function $\textts{alphaBetaMax}$
 \begin{enumerate}
 \item If $\textts{State}$ is a terminal state, the function returns the $\textts{utility}$ of the given
       $\textts{State}$.
-\item If $\textts{alpha} > \textts{beta}$, the function returns the lower bound $\textts{alpha}$.
-      In this case, we know that we can not have $\alpha \leq \textts{maxValue}(s) \leq \beta$.
-      Instead, we have either $\alpha \leq \textts{maxValue}(s)$ or $\textts{maxValue}(s) < \alpha$.
-      We analyse these cases separately.
-      \begin{enumerate}[(a)]
-      \item $\alpha \leq \textts{maxValue}(s)$
-
-            Then, because $\beta < \alpha$ we also have $\beta < \textts{maxValue}(s)$ and
-            we have
-            \\[0.2cm]
-            \hspace*{1.3cm}
-            $\beta \leq \alpha = \textts{alphaBetaMax}(s)$,
-            \\[0.2cm]
-            as required.
-      \item $\textts{maxValue}(s) < \alpha$.  As we have
-            \\[0.2cm]
-            \hspace*{1.3cm}
-            $\textts{alphaBetaMax}(s) = \alpha \leq \alpha$
-            \\[0.2cm]
-            the specification is again satisfied.
-      \end{enumerate}
-\item The case $\alpha = \beta$ is similar to the case above.
-      However, in that case we also have to deal with the case that $\alpha = \textts{maxValue}(s) = \beta$.
-      However, since then $\textts{alphaBetaMax}(s) = \alpha = \textts{maxValue}(s)$, this subcase is trivial.
 \item The variable $\textts{value}$ is supposed to store the maximum of the values of all states
       that can be reached from the given $\textts{State}$.
       
@@ -849,53 +821,58 @@ $\textts{evaluate}(s, f, \alpha, \beta)$
 where the parameters are interpreted as follows:
 \begin{enumerate}[(a)]
 \item $s$ is a state that is to be evaluated.
-\item $f$ is either the function \textts{maxValue} or the function \textts{minValue}.
+\item $f$ is either the function \textts{alphaBetaMax} or the function \textts{alphaBetaMin}.
       If in state $s$ the first player has to move, then $f = \textts{alphaBetaMax}$, otherwise we have
       $f = \textts{alphaBetaMin}$.
 \item We interpret the parameters $\alpha$ and $\beta$ in the same way as we did when we used them with
       the functions $\textts{alphaBetaMax}$ and $\textts{alphaBetaMin}$.
 \end{enumerate}
+The function \textts{evaluate} encapsulates calls to the functions \texttt{alphaBetaMax} and
+\texttt{alphaBetaMin}.  Given a state $s$, a function $f$, and the values of $\alpha$ and $\beta$, 
+it first checks whether the value of $f(s, \alpha, \beta)$ has already been computed and is stored in the
+cache.  If this is the case, the value is returned.  Otherwise, the function $f$ is called.  
+
 The function \textts{evaluate} makes use of a global variable \textts{gCache}.  This variable is used as a
 cache to store the results of the function \textts{evaluate}.  This cache is implemented as a dictionary.  The
 keys of this dictionary are the states, not triples of the form $\langle s, \alpha, \beta \rangle$.  The values
-that are stored a pairs of the form $\langle \textts{flag}, v \rangle$, where $v$ is a value computed by the
+are stored in pairs of the form $\langle \textts{flag}, v \rangle$, where $v$ is a value computed by the
 function $\textts{evaluate}(s, f, \alpha, \beta)$, while $\textts{flag} \in \{ \quoted{\leq}, \quoted{=}, \quoted{\geq}\}$.
 The cache satisfies the following specification:
 \begin{enumerate}
-\item $\texttt{gCache[State]} = (\quoted{=}, v) \rightarrow \texttt{evaluate(State)} = v$,
+\item $\texttt{gCache}[s] = (\quoted{=}, v) \rightarrow f(s, \alpha, \beta) = v$,
 
-      i.e.~if the flag is equal to \quoted{=}, then the value stored in \textts{gCache[State]}
-      is the exact value of the given \textts{State}.
-\item $\texttt{gCache[State]} = (\quoted{\leq}, v) \rightarrow \texttt{evaluate(State)} \leq v$,
+      i.e.~if the flag is equal to \quoted{=}, then the value stored in $\textts{gCache}[s]$
+      is the value computed for the given state $s$ by the function $f$.
+\item $\texttt{gCache}[s] = (\quoted{\leq}, v) \rightarrow f(s, \alpha, \beta) \leq v$,
 
-      i.e.~if the flag is equal to \quoted{\leq}, then the value stored in \textts{gCache[State]}
-      is an upper bound for \textts{evaluate(State)}.
+      i.e.~if the flag is equal to \quoted{\leq}, then the value stored in $\textts{gCache}[s]$
+      is an upper bound for the value returned from $f(s, \alpha, \beta)$.
 
-\item $\texttt{gCache[State]} = (\quoted{\geq}, v) \rightarrow \texttt{evaluate(State)} \geq v$,
+\item $\texttt{gCache}[s] = (\quoted{\geq}, v) \rightarrow f(s, \alpha, \beta) \geq v$,
 
       i.e.~if the flag is equal to \quoted{\geq}, then the value stored in \textts{gCache[State]}
-      is a lower bound for \textts{evaluate(State)}.
+      is a lower bound for $f(s, \alpha, \beta)$.
 \end{enumerate}
-If \textts{gCache[State]} is defined, then the computation of `evaluate(State, alpha, beta)`
+If $\textts{gCache}[s]$ is defined, then the computation of $\texttt{evaluate}(s, f, \alpha, \beta)$
 proceeds according to the following case distinction:
 \begin{enumerate}
 \item If the stored value $v$ is exact, we can return this value:
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\texttt{gCache[State]} = (\quoted{=}, v) \rightarrow \texttt{evaluate}(\texttt{State}, \alpha, \beta) = v$.
+      $\texttt{gCache}[s] = (\quoted{=}, v) \rightarrow \texttt{evaluate}(s, f, \alpha, \beta) = v$.
 \item If the stored value $v$ is an upper bound and this upper bound is less or equal than $\alpha$, then we know that
-      the true value of \textts{State} is less or equal than $\alpha$ and hence we can also return the value $v$:
+      the true value of $s$ is less or equal than $\alpha$ and hence we can also return the value $v$:
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\texttt{gCache[State]} = (\quoted{\leq}, v) \wedge v \leq \alpha \rightarrow 
-     \texttt{evaluate}(\texttt{State}, \alpha, \beta) = v$.
+      $\texttt{gCache}[s] = (\quoted{\leq}, v) \wedge v \leq \alpha \rightarrow 
+     \texttt{evaluate}(s, f, \alpha, \beta) = v$.
 \item If the stored value $v$ is an upper bound and this upper bound is bigger than $\alpha$ but less than
       $\beta$, then we know that the true value is less or equal than $v$ and hence we shrink the interval
       $[\alpha, \beta]$ into the interval $[\alpha, v]$.
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\texttt{gCache[State]} = (\quoted{\leq}, v) \wedge \alpha < v < \beta \rightarrow 
-     \texttt{evaluate}(\texttt{State}, \alpha, \beta) = f(\texttt{State}, \alpha, v)$.
+      $\texttt{gCache}[s] = (\quoted{\leq}, v) \wedge \alpha < v < \beta \rightarrow 
+     \texttt{evaluate}(s, f, \alpha, \beta) = f(s, \alpha, v)$.
      
       In this case, \textts{gCache} is updated.  
 
@@ -903,8 +880,8 @@ proceeds according to the following case distinction:
       stored value isn't of any help. 
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\texttt{gCache[State]} = (\quoted{\leq}, v) \wedge \beta \leq v \rightarrow 
-     \texttt{evaluate}(\texttt{State}, \alpha, \beta) = f(\texttt{State}, \alpha, \beta)$.
+      $\texttt{gCache}[s] = (\quoted{\leq}, v) \wedge \beta \leq v \rightarrow 
+     \texttt{evaluate}(s, f, \alpha, \beta) = f(s, \alpha, \beta)$.
 
       In this case,  \textts{gCache} needs to be updated.
 
@@ -912,23 +889,23 @@ proceeds according to the following case distinction:
       know that the true value is bigger or equal than $\beta$ and hence we can return the value $v$: 
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\texttt{gCache[State]} = (\quoted{\geq}, v) \wedge \beta \leq v \rightarrow 
-     \texttt{evaluate}(\texttt{State}, \alpha, \beta) = v$.
+      $\texttt{gCache}[s] = (\quoted{\geq}, v) \wedge \beta \leq v \rightarrow 
+     \texttt{evaluate}(s, f, \alpha, \beta) = v$.
 \item If the stored value $v$ is a lower bound and this lower bound is less than $\beta$ but bigger than $\alpha$,
       then we know that the true value is bigger or equal than $v$ and hence we shrink the interval $[\alpha,\beta]$
       into the interval $[v, \beta]$: 
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\texttt{gCache[State]} = (\quoted{\geq}, v) \wedge \alpha < v < \beta \rightarrow 
-     \texttt{evaluate}(\texttt{State}, \alpha, \beta) = f(\texttt{State}, v, \beta)$.
+      $\texttt{gCache}[s] = (\quoted{\geq}, v) \wedge \alpha < v < \beta \rightarrow 
+     \texttt{evaluate}(s, f, \alpha, \beta) = f(s, v, \beta)$.
      
       In this case, \textts{gCache} is updated.    
 \item If the stored value $v$ is a lower bound and this lower bound is less or equal than $\alpha$, then the
       stored value isn't of any help. 
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\texttt{gCache[State]} = (\quoted{\geq}, v) \wedge v \leq \alpha \rightarrow 
-      \texttt{evaluate}(\texttt{State}, \alpha, \beta) = f(\texttt{State}, \alpha, \beta)$.
+      $\texttt{gCache}[s] = (\quoted{\geq}, v) \wedge v \leq \alpha \rightarrow 
+      \texttt{evaluate}(s, f, \alpha, \beta) = f(s, \alpha, \beta)$.
 
       In this case, the \textts{gCache} needs to be updated.
 \end{enumerate}
@@ -1006,8 +983,6 @@ proceeds according to the following case distinction:
     def alphaBetaMax(State, alpha, beta):
         if finished(State):
             return utility(State)
-        if alpha >= beta:
-            return alpha
         v = alpha
         for ns in next_states(State, gPlayers[0]):
             v = max(v, evaluate(ns, alphaBetaMin, v, beta))
@@ -1018,8 +993,6 @@ proceeds according to the following case distinction:
     def alphaBetaMin(State, alpha, beta):
         if finished(State):
             return utility(State)
-        if beta <= alpha:
-            return beta
         v = beta
         for ns in next_states(State, gPlayers[1]):
             v = min(v, evaluate(ns, alphaBetaMax, alpha, v))
@@ -1033,30 +1006,21 @@ proceeds according to the following case distinction:
 \end{figure}
 \FloatBarrier
 
-\section{Depth Limited Search}
+\section{Progressive Deepening}
 In practice, most games are far too complex to be evaluated completely, i.e.~the size of the set
 $\textts{States}$ is so big that even the fastest computer does not stand a chance to explore this set
 completely.  For example, it is believed\footnote{
   For reference, compare the wikipedia article on the so-called
   \href{https://en.wikipedia.org/wiki/Shannon_number}{Shannon number}.
   The Shannon number estimates that there are at least $10^{120}$ different plays in chess.  However, the
-  number of states is estimated to be about $10^{50}$. 
+  number of states is estimated to be about $(4.48\pm 0.37) \cdot 10^{44}$. 
 }
-that in chess there are about $10^{50}$ different states that could occur in a game.
+that in chess there are about $4.48 \cdot 10^{44}$ different states that could occur in a game.
 Hence, it is impossible to explore all possible states in chess.  Instead, we have to limit
-the exploration in a way that is similar to the way professional players evaluate their game:  Usually, a
-player considers all variations of the game for, say, the next three moves.  After a given number of moves, the
-value of a position is estimated using an \blue{evaluation function}.  This function \blue{approximates} the true
+the exploration in a way that is similar to the way professional players evaluate their games:  Usually, a
+player considers all variations of a game for, say, the next three moves.  After a given number of moves, the
+value of a position is estimated using an \blue{evaluation heuristic}.  This function \blue{approximates} the true
 value of a given state via a heuristic.
-
-In order to implement this idea, we add a parameter $\textts{limit}$ to the procedure $\textts{alphaBeta}$ that
-was shown in the previous section.  On
-every recursive invocation of the function $\textts{alphaBeta}$, the parameter $\textts{limit}$ is decreased.
-Once the limit reaches $0$, instead of invoking the function $\textts{alphaBeta}$ again recursively, we try to
-estimate the value of 
-the given $\textts{State}$ using our \blue{evaluation function}.  This leads to the code shown in
-\myFig{Game.ipynb}. 
-
 
 \begin{figure}[!ht]
 \centering
@@ -1069,30 +1033,99 @@ the given $\textts{State}$ using our \blue{evaluation function}.  This leads to 
                   xleftmargin   = 0.0cm,
                   xrightmargin  = 0.0cm,
                 ]{python3}
-    def alphaBeta(State, player, limit, heuristic, alpha=-1, beta=1):
+    def pd_evaluate(State, limit, f=maxValue):
+        for l in range(limit+1):
+            value = evaluate(State, l, f)
+            if value in [-1, 1]:
+                return value
+        return value
+\end{minted}
+\caption{Progressive Deepening}
+\label{fig:Game.ipynb:pd_evaluate}
+\end{figure}
+\FloatBarrier
+
+
+In order to implement this idea, we add a parameter $\textts{limit}$ to the procedures $\textts{alphaBetaMax}$
+and $\textts{alphaBetaMin}$ that were shown in the previous section.  On
+every recursive invocation of the functions $\textts{alphaBetaMax}$ and$\textts{alphaBetaMin}$, the parameter
+$\textts{limit}$ is decreased. 
+Once the limit reaches $0$, instead of invoking the function $\textts{alphaBetaMax}$ or $\textts{alphaBetaMin}$
+again, we try to estimate the value of the given $\textts{State}$ using an \blue{evaluation heuristic}.  This
+leads to the code shown in \myFig{Game.ipynb}. 
+
+When we compare this Figure with \myFig{Alpha-Beta-Pruning.ipynb:alphaBeta}, the only difference is in line 4
+where we test whether the $\textts{limit}$ is $0$.  In this case, instead of trying to recursively evaluate the
+states reachable from $\textts{State}$, we evaluate the $\textts{State}$ with a $\textts{heuristic}$ function
+that tries to guess the approximate value of a given state.
+Notice that in the calls of the function \textts{evaluate} we have to take care to decrease the parameter
+$\textts{limit}$.  The function $\textts{evaluate}$ is responsible for administering the cache as previously.
+
+There is one further difference between the functions $\textts{maxValue}$ and $\textts{minValue}$ shown in
+Figure \ref{fig:Game.ipynb} and those versions of these functions that were shown previoulsly:
+In Figure \ref{fig:Game.ipynb} the $\textts{NextStates}$ are stored in a priority queue such that the move that
+is considered to be the best has the highest priority.  This way, the best moves are tried first and as a
+result alpha-beta-pruning is able to prune larger parts of the search space.
+In order to guess which move is best we use the cached values of the corresponding states.  This is the real
+reason for using progressive deepening:  When we evaluate the states with a depth limit of $l$, we can use the
+values of the states that has been stored previously when those states were evaluated with a depth limit of
+$l-1$. 
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                  framesep      = 0.3cm, 
+                  firstnumber   = 1,
+                  bgcolor       = sepia,
+                  numbers       = left,
+                  numbersep     = -0.2cm,
+                  xleftmargin   = 0.0cm,
+                  xrightmargin  = 0.0cm,
+                ]{python3}
+    def alphaBetaMax(State, limit, alpha=-1, beta=1):
         if finished(State):
-            return utility(State, player)
+            return utility(State)
         if limit == 0:
-            return heuristic(State, player)
-        val = alpha
-        for ns in next_states(State, player):
-            val_ns = value(ns, other(player), limit-1, heuristic, -beta, -alpha)
-            val    = max(val, -val_ns)
-            if val >= beta:
-                return val
-            alpha = max(val, alpha)
-        return val
+            return heuristic(State)
+        value      = alpha
+        NextStates = next_states(State, gPlayers[0])
+        Moves      = []  # empty priority queue
+        for ns in NextStates:
+            # heaps are sorted ascendingly, hence the minus
+            heapq.heappush(Moves, (-value_cache(ns, limit-1), ns))
+        while Moves != []:
+            _, ns = heapq.heappop(Moves)
+            value = max(value, evaluate(ns, limit-1, minValue, value, beta))
+            if value >= beta:
+                return value
+        return value    
+
+    def alphaBetaMin(State, limit, alpha=-1, beta=1):
+        if finished(State):
+            return utility(State)
+        if limit == 0:
+            return heuristic(State)
+        value      = beta
+        NextStates = next_states(State, gPlayers[1])
+        Moves      = []  # empty priority queue
+        for ns in NextStates:
+            heapq.heappush(Moves, (value_cache(ns, limit-1), ns))
+        while Moves != []:
+            _, ns = heapq.heappop(Moves)
+            value = min(value, evaluate(ns, limit-1, maxValue, alpha, value))
+            if value <= alpha:
+                return value
+                return value
+
+    def value_cache(State, limit):
+        flag, value = gCache.get((State, limit), ('=', 0))
+        return value
 \end{minted}
 \caption{Depth-limited $\alpha$-$\beta$-pruning.}
 \label{fig:Game.ipynb}
 \end{figure}
 \FloatBarrier
 
-When we compare this Figure with \myFig{Alpha-Beta-Pruning.ipynb:alphaBeta}, the only difference is in line 4
-where we test whether the $\textts{limit}$ is $0$.  In this case, instead of trying to recursively evaluate the
-states reachable from $\textts{State}$, we evaluate the $\textts{State}$ with our $\textts{heuristic}$ function.
-Later in the recursive calls of the function \textts{value} we have to take care to decrease the parameter
-$\textts{limit}$.
 
 For a game like tic-tac-toe it is difficult to come up with a decent heuristic.  A very crude approach would be
 to define:
@@ -1161,6 +1194,7 @@ player \textts{X} filling the bottom row with \textts{'X'}s does not count as a 
            Artificial-Intelligence/blob/master/Python/3 Games/Game-Move-Ordering.ipynb}.
       \eox
 \end{enumerate}
+\pagebreak
 
 \exercise
 Read up on the game \href{https://en.wikipedia.org/wiki/Connect_Four}{Connect Four}.  You can play it online at
