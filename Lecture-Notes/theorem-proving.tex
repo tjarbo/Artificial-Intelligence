@@ -3,26 +3,29 @@ Mathematics, and in particular mathematical theorem proving is clearly related t
 \blue{Automatic theorem proving} is the branch of artificial intelligence that investigates the use of
 artificial intelligence in mathematics.  The topic of \emph{automatic theorem proving} can easily fill more
 than one book.  For reasons of time we will restrict this chapter to deal with \blue{equational theorem proving}.  In
-\emph{equational theorem proving} we are given a set of axioms that are equations and we ask, which other
-equations can be followed from these axioms.  For example, a \blue{group} $\mathcal{G}$ is defined as a tuple
-of the form
+\emph{equational theorem proving} \index{equational theorem proving} we are given a set of axioms that are
+equations and we ask, which other equations can be derived from these axioms.  For example, a \blue{group}
+$\mathcal{G}$ \index{group} is defined as a triple of the form
 \\[0.2cm]
 \hspace*{1.3cm}
 $\mathcal{G} = \langle G, e, \cdot, i \rangle$
 \\[0.2cm]
 such that
 \begin{itemize}
-\item $G$ is a set.
+\item $G$ is a set.  The elements of this set are called \blue{group elements}. \index{group element}
 \item $e \in G$,
 
-      where $e$ is called the \blue{left-neutral element}.
+      i.e.~$e$ is an element of $G$.  For reasons that will soon become obvious, $e$ is called the
+      \blue{left-neutral element}.\index{left-neutral element} 
 \item $\cdot: G \times G \rightarrow G$,
 
-      where $\cdot$ is called the \blue{multiplication} of the group $\mathcal{G}$.
+      i.e.~$\cdot$ is a function mapping pairs of group elements to group elements.  The function $\cdot$ is
+      called the \blue{multiplication} of the group $\mathcal{G}$. 
 \item $i: G \rightarrow G$,
 
-      where for any $x \in G$ the element $i(x)$ is called the \blue{left-inverse} of $x$.
-\item Furthermore, the following \blue{axioms} have to be satisfied:
+      i.e.~$i$ is a function mapping group elements to group elements.  For any group element $x \in G$ the
+      element $i(x)$ is called the \blue{left-inverse} \index{left-inverse} of $x$. 
+\item Furthermore, the following \blue{group axioms} \index{group axioms} have to be satisfied:
       \begin{enumerate}
       \item $e \cdot x = x$, 
       \item $i(x) \cdot x = e$, 
@@ -33,7 +36,7 @@ In \href{https://en.wikipedia.org/wiki/Abstract_algebra}{abstract algebra}, it i
 the equation 
 \\[0.2cm]
 \hspace*{1.3cm}
-$x \cdot i(x) = e$, \quad i.e. the left inverse of $x$ is also a right inverse of $x$.
+$x \cdot i(x) = e$, \quad i.e.~the left inverse of any group element $x$ is also a right inverse of $x$.
 \\[0.2cm]
 A possible proof runs as follows:
 $$
@@ -57,7 +60,7 @@ $$
 $$
 Obviously, it is not trivial to come up with proofs of this kind.  Fortunately, there is a systematic approach to
 solve this and similar equational problems: In this chapter, we present an algorithm
-that can find equational proofs of the kind shown above.  This algorithm is known as the
+that can automatically find equational proofs of the kind shown above.  This algorithm is known as the
 \href{https://en.wikipedia.org/wiki/Knuth–Bendix_completion_algorithm}{Knuth-Bendix completion algorithm}.  It
 was discovered by Donald E. Knuth and Peter B. Bendix \cite{knuth:1970}.
 
@@ -77,7 +80,7 @@ like \blue{functions symbols}, \blue{variables}, \blue{terms}, \blue{substitutio
 the notion of a signature.
 
 \begin{Definition}[Signature]
-  A \blue{signature} is a triple of the form
+  A \blue{signature} \index{signature} is a triple of the form
   \\[0.2cm]
   \hspace*{1.3cm} $\Sigma = \langle \mathcal{V}, \mathcal{F}, \textsl{arity} \rangle$,
   \\[0.2cm]
@@ -85,7 +88,7 @@ the notion of a signature.
   \begin{enumerate}
   \item $\mathcal{V}$ is the set of \blue{variables}. \index{variable}
   \item $\mathcal{F}$ is the set of \blue{function symbols}. \index{function symbol}
-  \item $\textsl{arity}$ is a function with signature
+  \item $\textsl{arity}$ is a function such that
         \\[0.2cm]
         \hspace*{1.3cm}
         $\textsl{arity}: \mathcal{F} \rightarrow \mathbb{N}$.
@@ -94,6 +97,7 @@ the notion of a signature.
   \item We have $\mathcal{V} \cap \mathcal{F} = \{\}$, i.e.~variables are different from function symbols. \eoxs
   \end{enumerate}
 \end{Definition}
+\pagebreak
 
 \example
 The signature of \blue{group theory} $\Sigma_G$ can be defined as follows:
@@ -148,7 +152,7 @@ is ambiguous, since it can be interpreted as either $(x \cdot y) \cdot z$ or $x 
 \eoxs
 
 \begin{Definition}[$\Sigma$-Equation]
-  Assume a signature $\Sigma$ is given.  A \blue{$\Sigma$-equation}\index{equation} is a pair $\pair(s,t)$ such
+  Assume a signature $\Sigma$ is given.  A \blue{$\Sigma$-equation}\index{$\Sigma$-equation} is a pair $\pair(s,t)$ such
   that both $s$ and $t$ are $\Sigma$-terms.  The $\Sigma$-equation $\pair(s,t)$ is written as
   \\[0.2cm]
   \hspace*{1.3cm}
@@ -208,12 +212,13 @@ Then $\textfrak{G} = \pair(G, \mathcal{J})$ is a $\Sigma_G$-algebra.  \eoxs
 
 \begin{Definition}[Valid Equation]
   If $\Sigma = \langle \mathcal{V}, \mathcal{F}, \textsl{arity} \rangle$ is a signature,
-  $\textfrak{A} = \pair(A, \mathcal{J})$ is a $\Sigma$-algebra, and $I$ is a \blue{variable assignment}, i.e.~$I$
+  $\textfrak{A} = \pair(A, \mathcal{J})$ is a $\Sigma$-algebra, and $I$ is a \blue{variable
+    assignment}\index{variable assignment}, i.e.~$I$
   is a mapping of the form $I:\mathcal{V} \rightarrow A$,
   then we can \blue{evaluate} $\Sigma$-terms in $\textfrak{A}$ as follows:
   \begin{enumerate}
   \item $\texttt{eval}(x, I) := I(x)$ \quad for all $x \in \mathcal{V}$.
-  \item $\texttt{eval}(c, I) := c^\textfrak{A}$ \quad for all constant symbols $c \in \mathcal{F}$.
+  \item $\texttt{eval}(c, I) := c^\textfrak{A}$ \quad for every constant symbol $c \in \mathcal{F}$.
   \item $\texttt{eval}\bigl(f(t_1,\cdots,t_n)\bigr) := f^\textfrak{A}\bigl(\texttt{eval}(t_1,I),\cdots,\texttt{eval}(t_n,I)\bigr)$.
   \end{enumerate}
   A $\Sigma$-equation $s \approx t$ is \blue{valid} in the $\Sigma$-algebra $\textfrak{A}$ iff we have
@@ -240,8 +245,8 @@ Continuing the previous example we have the following:
 
 \begin{Definition}[$E$-Variety]
   Assume that $\Sigma$ is a signature and $E$ is a set of $\Sigma$-equations.  The collection of all
-  $\Sigma$-structures that satisfy every equation from $E$ is called the \blue{$E$-variety}.  To put it differently,
-  the $\Sigma$-structure $\textfrak{A}$ is a member of the \blue{$E$-variety} iff
+  $\Sigma$-structures that satisfy every equation from $E$ is called the \blue{$E$-variety}\index{$E$-variety}.
+  To put it differently, the $\Sigma$-structure $\textfrak{A}$ is a member of the \blue{$E$-variety} iff
   \\[0.2cm]
   \hspace*{1.3cm}
   $\textfrak{A} \models s \approx t$ \quad for every equation $s \approx t$ in $E$. \eoxs
@@ -283,7 +288,7 @@ The notion $E \models s \approx t$ is a \blue{semantic notion}.  We cannot hope 
 because if a set of equations $E$ and a possible logical consequence $s \approx t$ is given, there are, in
 general, infinitely many $\Sigma$-algebras that have to be checked.  Fortunately, the notion 
 $E \models s \approx t$ has a \blue{syntactical analog} $E \vdash s \approx t$ (read: $E$ proves $s \approx t$)
-that can be implemented and that is at least \blue{semi-decidable}, i.e.~we can write a program that given 
+that can be implemented and that is at least \blue{semi-decidable}, i.e.~we can create a program that given 
 a set of equations $E$ and an equation $s \approx t$ will return \texttt{True} if $E \vdash s \approx t$ holds, and will
 either return \texttt{False} or run forever if $E \vdash s \approx t$ does not hold.  Even more fortunately,
 \href{https://en.wikipedia.org/wiki/Gödel%27s_completeness_theorem}{G\"{o}dels completeness theorem} 
@@ -329,8 +334,8 @@ Now we are ready to formally define the notion $E \vdash s \approx t$.  This not
 \item If $E \vdash s \approx t$, then $E \vdash t \approx s$.  \hspace*{\fill} (\blue{Symmetry})
 \item If $E \vdash r \approx s$ and $E \vdash s \approx t$, then $E \vdash r \approx t$.  
       \hspace*{\fill} (\blue{Transitivity})
-\item If $\textsl{arity}(f) = n$ and $E \vdash s_i \approx t_i$ for all $i \in \{1,\cdots,n\}$, then
-      $E \models f(s_1,\cdots,s_n) \approx f(t_1,\cdots,t_n)$.
+\item If $\textsl{arity}(f) = n$ and $E \vdash s_i \approx t_i$ for all $i \in \{1,\cdots,n\}$, \\
+      then $E \models f(s_1,\cdots,s_n) \approx f(t_1,\cdots,t_n)$.
       \hspace*{\fill} (\blue{Congruence})
 \item If $E \vdash s \approx t$ and $\sigma$ is a $\Sigma$-substitution, then $E \vdash s\sigma \approx t\sigma$.
       \hspace*{\fill} (\blue{Stability})
@@ -364,13 +369,14 @@ in a term $t$, the notion of the \blue{subterm} of a given term $t$ at a given p
   \item $f(t_1,\cdots,t_n)/\bigl([i]+u\bigr) := t_i/u$.  \eoxs
   \end{enumerate}
 \end{Definition}
+\pagebreak
 
 \begin{Definition}[Subterm Replacement, \mbox{$t[u \mapsto s]$}] \hspace*{\fill} \\
   Given a term $t$, a position $t \in \Pos(t)$, and a term $s$, the expression
   $t[u \mapsto s]$ denotes the term that results from $t$ when the subterm $t/u$ is replaced by the term 
   $s$.  This expression is defined by induction on $u$.
   \begin{enumerate}
-  \item $t/\bigl[ [] \mapsto s \bigr] := s$,
+  \item $t\bigl[ [] \mapsto s \bigr] := s$,
   \item $f(t_1,\cdots,t_n)\bigl[ [i]+u \mapsto s \bigr] := f(t_1, \cdots, t_{i-1},t_i[u \mapsto s], t_{i+1},\cdots, t_n)$.  
         \eoxs
   \end{enumerate}
@@ -469,7 +475,7 @@ additional equations are added to $E$ in this process.  To proceed, we need the 
   \item $\prec$ is \blue{stable under substitutions}, i.e we have
         \\[0.2cm]
         \hspace*{1.3cm}
-        $r \prec l \;\Rightarrow\; r\sigma \prec l\sigma$ \quad for every substitution $\Sigma$.
+        $r \prec l \;\Rightarrow\; r\sigma \prec l\sigma$ \quad for every substitution $\sigma$.
   \item $\prec$ is a \blue{congruence}, i.e we have
         \\[0.2cm]
         \hspace*{1.3cm}
@@ -488,7 +494,7 @@ additional equations are added to $E$ in this process.  To proceed, we need the 
   $r \prec l$ \quad for every equation $(l \approx r) \in E$.
   \\[0.2cm]    
   This means that all equations in $E$ are ordered such that the right hand side is smaller than the left
-  hand side w.r.t. $\prec$.    \eod
+  hand side w.r.t.~$\prec$.    \eod
 \end{Definition}
 Later we will see an example of a rewrite order.  For now, we just assume that 
 the relation $\prec$ is a rewrite order w.r.t.~a given set of equations $R$.  The equations in $R$ will now be called
@@ -572,7 +578,7 @@ transitive closure of $\rightarrow$ is written as $\stackrel{_*}{\rightarrow}$.
 The next theorem shows that confluence is all we need to reduce the relation $\stackrel{_*}{\leftrightarrow}$
 to the relation $\stackrel{_*}{\rightarrow}$. 
 
-\begin{Theorem}[Church-Rosser]
+\begin{Theorem}[\href{https://en.wikipedia.org/wiki/Church–Rosser_theorem}{Church-Rosser}]
   If the relation $\rightarrow \;\subseteq\; M \times M$ is confluent, then we have
   \\[0.2cm]
   \hspace*{1.3cm}
@@ -636,8 +642,10 @@ to guarantee confluence.
    \exists d \in M: (b \stackrel{_*}{\rightarrow} d \;\wedge\; c \stackrel{_*}{\rightarrow} d)\bigr)
   $  \eox
 \end{Definition}
+\pagebreak
 
-\begin{Theorem}[Transfinite Induction] \hspace*{\fill} \\
+\begin{Theorem}[\href{https://en.wikipedia.org/wiki/Transfinite_induction}{Transfinite Induction}]
+  \hspace*{\fill} \index{transfinite induction}\\
   Assume the relation $\rightarrow \;\subseteq\; M \times M$ is well-founded and $F(x)$ is some formula.
   If we have that
   \\[0.2cm]
@@ -668,7 +676,7 @@ $
 such that $F(a_n)$ is false.  But this would contradict the well-foundedness of the relation $\rightarrow$.  Hence there can be no $a \in M$
 such that $F(a)$ is false. \qed
 
-\begin{Theorem}[Newman's Lemma] \hspace*{\fill} \\
+\begin{Theorem}[\href{https://en.wikipedia.org/wiki/Newman\%27s_lemma}{Newman's Lemma}] \hspace*{\fill} \\
   If the relation $\rightarrow \;\subseteq\; M \times M$ is well-founded and locally confluent, then it is
   already confluent.
 \end{Theorem}
@@ -786,7 +794,7 @@ $\Sigma$-terms.  In order to do so, three prerequisites need to be satisfied:
       $w$, i.e. the following condition needs to be satisfied:
    $$ w(f) = 0 \rightarrow \forall g:  \bigl(g \not=f \rightarrow g < f\bigr). $$
       To put this in words: If the function symbol $f$ has a weight of $0$, then 
-      all other function symbols $g$ have to be smaller than $f$ w.r.t. the strict order $<$.
+      all other function symbols $g$ have to be smaller than $f$ w.r.t.~the strict order $<$.
       Note that this implies that there can be at most one function symbol with $f$ such that $w(f) = 0$. 
       This function symbol $f$ is then the maximum w.r.t.~the order $<$.
 \end{enumerate}
@@ -838,6 +846,226 @@ and a congruence can be done via induction on the structure of the terms.  The h
 show that the Knuth-Bendix order is well-founded.  A proof is given in the book by Franz Baader and Tobias
 Nipkow \cite{baader:1998}.
 
+\section{Unification}
+This section introduces the notion of a \blue{most general unifier} of two terms.
+To begin, we define the composition of two $\Sigma$-substitutions.
+
+\begin{Definition}[Composition of Substitutions] \index{Composition von Substitutions}
+    Assume that \\[0.2cm]
+    \hspace*{1.3cm}
+    $\sigma = \{ x_1 \mapsto s_1, \cdots, x_m \mapsto s_m \}$
+    \quad and \quad
+    $\tau = \{ y_1 \mapsto t_1, \cdots, y_n \mapsto t_n \}$
+    \\[0.2cm]
+    are two substitutions such that $\textsl{dom}(\sigma) \cap \textsl{dom}(\tau) = \{\}$.
+    We define the  \blue{composition $\sigma\tau$} \index{composition $\sigma\tau$} of $\sigma$ and $\tau$  as
+    \\[0.2cm]
+    \hspace*{1.3cm}
+    $\sigma\tau := \{ x_1 \mapsto s_1\tau, \cdots, x_m \mapsto s_m\tau,\; y_1 \mapsto t_1, \cdots, y_n \mapsto t_n \}$
+    \eox
+\end{Definition}
+
+\example
+If we define
+\\[0.2cm]
+\hspace*{1.3cm}
+$\sigma := \{ x_1 \mapsto c,\; x_2 \mapsto f(x_3) \}$ \quad and \quad
+$\tau := \{ x_3 \mapsto h(c,c),\; x_4 \mapsto d \}$,
+\\[0.2cm]
+then we have
+\\[0.2cm]
+\hspace*{1.3cm}
+$\sigma\tau = \{ x_1 \mapsto c,\; x_2 \mapsto f(h(c,c)),\; x_3 \mapsto h(c,c),\;x_4 \mapsto d \}$.
+\eoxs
+\vspace{0.3cm}
+
+\begin{Proposition} \label{satz:composition}
+    If $t$ is a term and $\sigma$ and $\tau$ are substitutions such that  
+    $\textsl{dom}(\sigma) \cap \textsl{dom}(\tau) = \{\}$ holds, then we have
+    \\[0.2cm]
+    \hspace*{1.3cm} $(t \sigma)\tau = t (\sigma\tau)$.
+    \eoxs
+\end{Proposition}
+This proposition may be proven by induction on $t$.
+
+\begin{Definition}[Syntactical Equation] \index{syntactical equation}
+  A  \blue{syntactical equation} is a pair $\langle s, t \rangle$ of terms.
+  It is written as $s \doteq t$. \index{$s \doteq t$}
+  A \blue{system of syntactical equations} \index{system of syntactical equations} is a set of syntactical
+  equations.
+  \eoxs
+\end{Definition}
+
+
+\begin{Definition}[Unifier]
+  A substitution $\sigma$ \blue{solves} a syntactical equation $s \doteq t$ iff we have $s\sigma = t\sigma$.
+  If $E$ is a system of syntactical equations and $\sigma$ is a substitution that solves
+  every syntactical equations in $E$, then $\sigma$ is a  \blue{unifier} \index{unifier} of $E$.
+  \eoxs
+\end{Definition}
+
+\noindent
+If $E = \{ s_1 \doteq t_1, \cdots, s_n \doteq t_n \}$ is a system of syntactical equations and $\sigma$ is a
+substitution, then we define
+\\[0.2cm]
+\hspace*{1.3cm}  $E\sigma := \{ s_1\sigma \doteq t_1\sigma, \cdots, s_n\sigma \doteq t_n\sigma \}$.
+\vspace{0.3cm}
+
+\example
+Let us consider the syntactical equation
+\\[0.2cm]
+\hspace*{1.3cm}
+$p(x_1, f(x_4)) \doteq p( x_2, x_3)$
+\\[0.2cm]
+and define the substitution
+\\[0.2cm]
+\hspace*{1.3cm}
+$\sigma := \{ x_1 \mapsto x_2,\; x_3 \mapsto f(x_4) \}$.
+\\[0.2cm]
+Then $\sigma$ solves the given syntactical equation because we have
+\\[0.2cm]
+\hspace*{1.3cm}
+$p(x_1, f(x_4))\sigma = p(x_2, f(x_4))$ \quad und \quad \\[0.2cm]
+\hspace*{1.3cm}
+$p(x_2, x_3)\sigma \;\quad = p(x_2, f(x_4))$.  \eox
+
+Next we develop an algorithm for solving a system of syntactical equations.
+The algorithm we present was published by Martelli and Montanari
+\cite{martelli:1982}.\index{algorithm of Martelli and Montanari}  
+To begin, we first consider the cases where a syntactical equation $s \doteq t$ is \blue{unsolvable}.
+There are two cases: A syntactical equation of the form
+\\[0.2cm]
+\hspace*{1.3cm}
+$f(s_1,\cdots,s_m) \doteq g(t_1,\cdots, t_n)$ \\[0.2cm]
+is certainly unsolvable if  $f$ and $g$ are different function symbols. The reason is that for any substitution
+$\sigma$ we have that \\[0.2cm]
+\hspace*{1.0cm} $f(s_1,\cdots,s_m)\sigma = f(s_1\sigma,\cdots,s_m\sigma)$ \quad und \quad
+                $g(t_1,\cdots, t_n)\sigma = g(t_1\sigma,\cdots,t_n\sigma)$. \\[0.2cm]
+If $f \not = g$, then the terms  $f(s_1,\cdots,s_m)\sigma$ and $g(t_1,\cdots, t_n)\sigma$ start with different
+function symbols and hence they can't be identical.
+
+The other case where a syntactical equation is unsolvable, is a syntactical equation of the following form:
+\\[0.2cm]
+\hspace*{1.3cm}
+$x \doteq f(t_1,\cdots,t_n)$  \quad where $x \in \texttt{var}\big(f(t_1,\cdots,t_n)\big)$.
+\\[0.2cm]
+This syntactical equation is unsolvable because the term $f(t_1,\cdots,t_n)\sigma$ will always contain at least one more
+occurrence of the function symbol $f$ than the term $x\sigma$.
+
+Now we are able to present an algorithm for solving a system of syntactical equations, provided the system is
+solvable.  The algorithm will also discover if a system of syntactical equations is unsolvable.
+The algorithm works on pairs of the form
+$\langle F, \tau \rangle$ where $F$ is a system of syntactical equations and $\tau$ is a substitution.
+The algorithm starts with the pair 
+$\langle E, \{\} \rangle$.  Here $E$ is the system of syntactical equations that is to be solved and $\{\}$
+represents the empty substitution.  The system works by simplifying the pairs $\langle F, \tau \rangle$ using
+certain reduction rules that are presented below.  These reduction rules are applied until we either discover
+that the system of syntactical equations is unsolvable or else we reduce the pairs until we finally arrive at a
+pair of the form $\langle \{\}, \mu \rangle$.  In this case  $\mu$ is a unifier of the system of
+syntactical equations $E$.  The reduction rules are as follows:
+\begin{enumerate}
+\item If  $y\in\mathcal{V}$ is a variable that does  \underline{\color{red}not} occur in the term $t$, then
+      we can perform the following reduction: 
+      \[ \Big\langle E \cup \big\{ y \doteq t \big\}, \sigma \Big\rangle \quad\leadsto\quad 
+         \Big\langle E\{y \mapsto t\}, \sigma\{ y \mapsto t \} \Big\rangle \qquad\mbox{if $y \in \mathcal{V}$
+           and $y \not\in \mathtt{var}(t)$} 
+      \]
+      This reduction rule can be understood as follows: If the system of syntactical equations that is to be
+      solved contains a syntactical equation of the form $y \doteq t$, where the variable $y$ does not occur in
+      the term $t$, then the syntactical equation $y \doteq t$ can be removed if we apply the substitution
+      $\{ y \mapsto t \}$ to both components of the pair
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      $\Big\langle E \cup \big\{ y \doteq t \big\}, \sigma \Big\rangle$.
+\item If the variable $y$ occurs in the term $t$, i.e.~if  $y \in \textsl{Var}(t)$
+      and, furthermore, $t \not= y$, then the system of syntactical equations
+      $E \cup \big\{ y \doteq t \big\}$ has no solution.  We write this as
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      $\Big\langle E \cup \big\{ y \doteq t \big\}, \sigma \Big\rangle\;\leadsto\; \Omega$ \quad
+      if $y \in \texttt{var}(t)$ and $y \not=t$.
+\item If $y\in\mathcal{V}$ and  $t \not\in \mathcal{V}$, then we have:
+      \[ \Big\langle E \cup \big\{ t \doteq y \big\}, \sigma \Big\rangle \quad\leadsto\quad 
+         \Big\langle E \cup \big\{ y \doteq t \big\}, \sigma \Big\rangle \qquad\mbox{if $y \in \mathcal{V}$ and
+           $t \not\in \mathcal{V}$.}
+      \]   
+      After we apply this rule, we can apply either the first or the second reduction rule thereafter.
+\item Trivial syntactical equations can be deleted:
+      \[ \Big\langle E \cup \big\{ x \doteq x \big\}, \sigma \Big\rangle \quad\leadsto\quad
+         \Big\langle E, \sigma \Big\rangle \qquad\mbox{if $x \in \mathcal{V}$.}
+      \]   
+\item If $f$ is an  $n$-ary function symbol we have 
+      \[ \Big\langle E \cup \big\{ f(s_1,\cdots,s_n) \doteq f(t_1,\cdots,t_n) \big\}, \sigma \Big\rangle 
+         \;\leadsto\; 
+         \Big\langle E \cup \big\{ s_1 \doteq t_1, \cdots, s_n \doteq t_n\}, \sigma \Big\rangle.
+      \]   
+
+      This rules is the reason that we have to work with a system of syntactical equations, because even if we
+      start with a single syntactical equation the rule given above can increase the number of syntactical
+      equations. 
+
+      A special case of this rule is the following:  
+      \[ \Big\langle E \cup \big\{ c \doteq c \big\}, \sigma \Big\rangle \;\leadsto\; 
+         \Big\langle E, \sigma \Big\rangle.
+      \]
+      Here $c$ is a nullary function symbol.
+\item The system of syntactical equations $E \cup \big\{ f(s_1,\cdots,s_m) \doteq g(t_1,\cdots,t_n) \big\}$ has
+      no solution if the function symbols $f$ and $g$ are different.  Hence we have
+      \[ \Big\langle E \cup \big\{ f(s_1,\cdots,s_m) \doteq g(t_1,\cdots,t_n) \big\},
+      \sigma \Big\rangle \;\leadsto\; \Omega \qquad \mbox{provided $f \not= g$}. \]
+\end{enumerate}
+If a system of syntactical equations $E$ is given and we start with the pair 
+$\langle E, \{\}\rangle$, then we can apply the rules given above until one of the following two cases happens: 
+\begin{enumerate}
+\item We use the second or the sixth of the reduction rules given above.
+      In this case the system of syntactical equations $E$ is unsolvable.
+\item The pair $\langle E, \{\} \rangle$ is reduced into a pair of the form $\langle \{\}, \mu\rangle$.
+      Then $\mu$ is a  \blue{unifier} of $E$.  In this case we write $\mu = \mathtt{mgu}(E)$.
+      If $E = \{ s \doteq t \}$, we write $\mu = \mathtt{mgu}(s, t)$.  The abbreviation
+      $\mathtt{mgu}$ is short for {``\blue{most general unifier}''}.
+\end{enumerate}
+
+\example
+We show how to solve the syntactical equation \\[0.2cm]
+\hspace*{1.3cm}  $p(x_1, f(x_4)) \doteq p( x_2, x_3)$.  \\[0.2cm]
+We have the following reductions:
+$$
+\begin{array}{ll}
+          &  \big\langle \big\{ p(x_1, f(x_4)) \doteq p( x_2, x_3) \big\}, \{ \} \big\rangle \\[0.2cm]
+ \leadsto &  \big\langle \big\{ x_1 \doteq x_2, f(x_4) \doteq x_3 \big\}, \{ \} \big\rangle \\[0.2cm]
+ \leadsto &  \big\langle \big\{ f(x_4) \doteq x_3 \big\}, \{ x_1 \mapsto x_2 \} \big\rangle \\[0.2cm]
+ \leadsto &  \big\langle \big\{ x_3 \doteq f(x_4) \big\}, \{ x_1 \mapsto x_2 \} \big\rangle \\[0.2cm]
+ \leadsto &  \big\langle \big\{\big\}, \{ x_1 \mapsto x_2,\; x_3 \mapsto f(x_4) \} \big\rangle \\[0.2cm]
+\end{array}
+$$
+Hence the methos is successful and we have that the substitution
+\\[0.2cm]
+\hspace*{1.3cm}
+$\{ x_1 \mapsto x_2,\; x_3 \mapsto f(x_4) \}$ \\[0.2cm]
+is a solution of the syntactical equation given above.  \eox
+
+\example
+Next we try to solve the following system of syntactical equations: 
+\[ E = \big\{ p(h(x_1,c)) \doteq p(x_2),\; q(x_2, d) \doteq q(h(d,c),x_4) \big\} \]
+We have the following reductions:
+$$
+\begin{array}{ll}
+          & \big\langle \big\{ p(h(x_1,c)) \doteq p(x_2),\; q(x_2, d) \doteq q(h(d,c),x_4) \big\}, \{ \} \big\rangle \\[0.2cm]
+ \leadsto & \big\langle \big\{ p(h(x_1,c)) \doteq p(x_2),\; x_2 \doteq h(d,c), \; d \doteq x_4 \big\}, \{ \} \big\rangle \\[0.2cm]
+ \leadsto & \big\langle \big\{ p(h(x_1,c)) \doteq p(x_2),\; x_2 \doteq h(d,c), \; x_4 \doteq d \big\}, \{ \} \big\rangle \\[0.2cm]
+ \leadsto & \big\langle \big\{ p(h(x_1,c)) \doteq p(x_2),\; x_2 \doteq h(d,c) \big\}, \{ x_4 \mapsto d \} \big\rangle \\[0.2cm]
+ \leadsto & \big\langle \big\{ p(h(x_1,c)) \doteq p(h(d,c)) \big\}, \{ x_4 \mapsto d,\; x_2 \mapsto h(d,c) \} \big\rangle \\[0.2cm]
+ \leadsto & \big\langle \big\{ h(x_1,c) \doteq h(d,c) \big\}, \{ x_4 \mapsto d,\; x_2 \mapsto h(d,c) \} \big\rangle \\[0.2cm]
+ \leadsto & \big\langle \big\{ x_1 \doteq d,\; c \doteq c \big\}, \{ x_4 \mapsto d,\; x_2 \mapsto h(d,c) \} \big\rangle \\[0.2cm]
+ \leadsto & \big\langle \big\{ x_1 \doteq d,\big\}, \{ x_4 \mapsto d,\; x_2 \mapsto h(d,c) \} \big\rangle \\[0.2cm]
+ \leadsto & \big\langle \big\{\big\}, \{ x_4 \mapsto d,\; x_2 \mapsto h(d,c),\; x_1 \mapsto d \} \big\rangle \\[0.2cm]
+\end{array}
+$$
+Hence the  substitution  $\{ x_4 \mapsto d,\; x_2 \mapsto h(d,c),\; x_1 \mapsto d \}$ is a solution
+of the system of syntactical equations given above.
+\eox
+
+
 \section{The Knuth-Bendix Algorithm}
 Assume we have been given a set $R$ of rewrite rules such that
 \\[0.2cm]
@@ -848,21 +1076,22 @@ such that the relation $\prec$ is a rewrite order.
 Given two terms $s$ and $t$, the Church-Rosser Theorem tells us, that we can decide the question whether
 $s \leftrightarrow_R^* t$ holds by rewriting $s$ and $t$ into normal forms, provided the relation
 $\rightarrow_R$ is confluent.  By Newman's Lemma we know that local confluence is sufficient.  Donald E.~Knuth
-and Peter B.~Bendix \cite{knuth:1970} have discovered a way to decide, whether the term rewriting relation
+and Peter B.~Bendix \cite{knuth:1970} have discovered a way to decide whether the term rewriting relation
 $\rightarrow_R$ is locally confluent.  To understand their idea, we introduce the notion of a \blue{critical pair}.
 
 \begin{Definition}[Critical Pair] \hspace*{\fill} \\
-  A pair of $\Sigma$-terms $\langle s, t\rangle$ is a \blue{critical pair} of the equation $l_1 \approx r_1$ and
-  the equation $l_2 \approx r_2$ if and only if all of the following conditions hold:
+  \index{critical pair}
+  Assume we have been given the equations $l_1 \approx r_1$ and $l_2 \approx r_2$.  These equations
+  \blue{generate} a critical pair if and only if all of the following conditions hold:
   \begin{enumerate}[(a)]
   \item There exists a position $u \in \Pos(l_1)$ such that $l_1/u$ is not a variable.
-  \item The subterm $l_1/u$ of $l_1$ is unifiable with $l_2$.  Assume that $\mu$ is a most general unifier
+  \item The subterm $l_1/u$ of $l_1$ is unifiable with $l_2$.  For the following, assume that $\mu$ is a most general unifier
         of $l_1/u$ and $l_2$, i.e.~we have
         \\[0.2cm]
         \hspace*{1.3cm}
         $\mu = \texttt{mgu}(l_1/u, l_2)$.
-  \item The term $s$ results from rewriting the term $l_1\mu$ by rewriting the subterm $l_1/u$
-        to the new subterm $r_2\mu$ using the rule $l_2 \approx r_2$:      
+  \item The term $s$ results from rewriting the term $l_1\mu$ by rewriting the subterm $l_1\mu/u$
+        to the new subterm $r_2\mu$ using the rewrite rule $l_2 \approx r_2$:      
         \\[0.2cm]
         \hspace*{1.3cm}
         $s = l_1\mu[u \mapsto r_2\mu]$.
@@ -872,7 +1101,7 @@ $\rightarrow_R$ is locally confluent.  To understand their idea, we introduce th
         \hspace*{1.3cm}
         $t = r_1\mu$.  
       \end{enumerate}
-      Hence, if the conditions given above are satisfied, then
+      Then the pair
       \\[0.2cm]
       \hspace*{1.3cm}
       $\bigl\langle l_1\mu[u \leftarrow r_2\mu],\; r_1\mu \bigr\rangle$
@@ -902,9 +1131,10 @@ and the latter term can be rewritten by the equation $i(w) \cdot w \approx e$ in
 i.e.~we have
 \\[0.2cm]
 \hspace*{1.3cm}
-$\bigl(i(w) \cdot w\bigr) \cdot z \rightarrow_{\{ i(w) \cdot w \approx e\}} e \cdot z$,
+$\bigl(i(w) \cdot w\bigr) \cdot z \rightarrow_{\{ i(w) \cdot w \approx e\}} e \cdot z$.
 \\[0.2cm]
-and by the equation $(x \cdot y) \cdot z \approx x \cdot (y \cdot z)$ into the term $i(w) \cdot (w \cdot z)$:
+Furthermore, the same term $\bigl(i(w) \cdot w\bigr) \cdot z$ can be rewritten by the equation
+$(x \cdot y) \cdot z \approx x \cdot (y \cdot z)$ into the term $i(w) \cdot (w \cdot z)$:  
 \\[0.2cm]
 \hspace*{1.3cm}
 $\bigl(i(w) \cdot w\bigr) \cdot z \rightarrow_{\{ (x \cdot y) \cdot z \approx x \cdot (y \cdot z)\}} i(w) \cdot (w \cdot z)$.
@@ -930,16 +1160,16 @@ $R \models s \approx t$. \eox
   $t$ such that $t$ is in $R$-normal form and we have both
   \\[0.2cm]
   \hspace*{1.3cm}
-  $s_1 \rightarrow_R^* t$ \quad and \quad   $s_2 \rightarrow_R^* t$.  
+  $s_1 \stackrel{_*}{\rightarrow}_R t$ \quad and \quad   $s_2 \stackrel{_*}{\rightarrow}_R t$.  
 \end{Definition}
 
 \begin{Theorem}[Knuth-Bendix]
-  If $R$ is a set of rewrite equations so that all critical pairs between equations from $R$ are confluent,
-  then the rewrite relation $\rightarrow_R^*$ is confluent and hence the question, whether $R \models s \approx t$
+  If $R$ is a set of rewrite equations such that all critical pairs between equations from $R$ are confluent,
+  then the rewrite relation $\stackrel{_*}{\rightarrow}_R$ is confluent and hence the question, whether $R \models s \approx t$
   can be decided by rewriting both $s$ and $t$ into normal forms $\widehat{s}$ and $\widehat{t}$:
   \\[0.2cm]
   \hspace*{1.3cm}
-  $s \rightarrow_R^* \widehat{s}$ \quad and \quad  $t \rightarrow_R^* \widehat{t}$ 
+  $s \stackrel{_*}{\rightarrow}_R \widehat{s}$ \quad and \quad  $t \stackrel{_*}{\rightarrow}_R \widehat{t}$ 
   \\[0.2cm]
   Then we have
   \\[0.2cm]
@@ -950,7 +1180,7 @@ $R \models s \approx t$. \eox
 \noindent
 To make the above theorem work, if we start with a set $E$ of equations, we first have to order them into a set
 of rewrite rules $R$.  In general, this will not be sufficient because there will be critical pairs that are
-not confluent. However, if we can orient these newly derived critical pairs into rewrite rules, we might be
+not confluent. However, if we can orient these newly derived critical pairs into new rewrite rules, we might be
 able to extend the set $R$ to a new set of rewrite $\widehat{R}$ such that all critical pairs from equations
 from $\widehat{R}$ are confluent.
 \vspace*{0.2cm}
@@ -965,7 +1195,7 @@ from $\widehat{R}$ are confluent.
       into rewrite rules.
 \item Compute all critical pairs that can be build from equations in $R$.
       \begin{enumerate}
-      \item If all critical pairs are confluent, then the rewrite relation $\rightarrow_R^*$ is confluent
+      \item If all critical pairs are confluent, then the rewrite relation $\stackrel{_*}{\rightarrow}_R$ is confluent
             and the algorithm is successful.
       \item If we have found a critical pair $\langle s, t \rangle$ that is not confluent,
             we orient the equation $s \approx t$ into a rewrite rule.  If this is impossible, the algorithm fails.
