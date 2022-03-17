@@ -114,12 +114,8 @@ defined as the fraction of those objects that are classified correctly, i.e.~
 \hspace*{1.3cm}
 $\ds \mathtt{accuracy} := \frac{\;\mathtt{card}\bigl( \{ o \in S \mid \mathtt{guess}(o) = \mathtt{classify}(o)\}\bigr)\;}{\mathtt{card}(S)}$.
 \\[0.2cm]
-If the set $S$ is infinite, this equation has to be interpreted as a limit, i.e.~we can define
-$S_n$ as the set of strings that have a length of at most $n$.  Then, the accuracy can be defined as a limit:
-\\[0.2cm]
-\hspace*{1.3cm}
-$\ds \mathtt{accuracy} := \lim\limits_{n\rightarrow\infty}\frac{\mathtt{card}\bigl(\{ o \in S_n \mid \mathtt{guess}(o) = \mathtt{classify}(o)\}\bigr)\;}{\mathtt{card}(S_n)}$.
-\\[0.2cm]
+To keep matters simple, we will assume that the sample space is finite.
+
 The function $\mathtt{model}$ is usually determined by a set of \blue{parameters} or \blue{weights} $\mathbf{w}$. In
 this case, we have
 \\[0.2cm]
@@ -135,8 +131,8 @@ When it comes to the choice of model, it is important to understand that, at lea
 \underline{all} models are wrong.  Nevertheless, \underline{some} models are useful.  There are two reasons for this:
 \begin{enumerate}
 \item We do not fully understand the function \texttt{classify} that we want to approximate by the function $\mathtt{model}$.
-\item The function \texttt{classify} is so complex, that even if we could compute it exactly, the resulting model 
-      would be much too complicated.
+\item In the most general setting, the function \texttt{classify} is so complex, that even if we could compute
+      it exactly, the resulting model would be much too complicated.
 \end{enumerate}
 The situation is similar in physics: Let us assume that we intend to model the fall of an object.  A model that is a
 hundred percent accurate would have to include the following forces:
@@ -177,15 +173,19 @@ We conclude this introductory section by fixing some notation.  Let us assume th
 are numbered 
 from $1$ to $N$, while the features are numbered from $1$ to $D$.  Then we define
 \begin{enumerate}
-\item $\textbf{x}_i := \langle\mathtt{feature}(o_i, 1), \cdots, \mathtt{feature}(o_i, D)\rangle$ \quad for all $i \in \{1, \cdots, N\}$.
+\item $\textbf{x}_i := \langle\mathtt{feature}(o_i, 1), \cdots, \mathtt{feature}(o_i, D)\rangle^\top$ \quad for all $i \in \{1, \cdots, N\}$.
   
-      i.e.~$\mathbf{x}_i$ is a $D$-dimensional row vector that collects the features of the $i$-th training object.
+      i.e.~$\mathbf{x}_i$ is a $D$-dimensional column vector that collects the features of the $i$-th training object.
 \item $x_{i,j} := \mathtt{feature}(o_i, j)$ \quad for all $i \in \{1, \cdots, N\}$ and $j \in \{1, \cdots, D\}$.
 
-      i.e.~$x_{i,j}$ is the $j$-th feature of the $i$-th object.
+      i.e.~$x_{i,j}$ is the $j$-th feature of the $i$-th object.  The numbers $x_i{i,j}$ are combined into the
+      feature matrix $X$, \index{feature matrix} i.e.~we have
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      $X=(x_{i,j})_{i\in\{1,\cdots,N\} \atop j \in \{1,\cdots,D\}.}$ 
 \item $y_i := \mathtt{classify}(o_i)$ \quad for all $i \in \{1, \cdots, N\}$
 
-      i.e.~$y_i$ is the class of the $i$-th object.
+      i.e.~$y_i$ is the class of the $i$-th object.  These number are collected into the $N$-dimensional column vector $\mathbf{y}$.
 \end{enumerate}
 
 \subsection{Applications of Classification}
@@ -206,14 +206,14 @@ illness, i.e.~the set of classes for the classification problem would be
 \hspace*{1.3cm}
 $\{ \mathtt{commonCold}, \mathtt{pneumonia}, \mathtt{asthma}, \mathtt{flu}, \texttt{Covid-19}, \cdots, \mathtt{unknown} \}$.
 \\[0.2cm]
-Hence, the task of disease diagnosis is a classification problem.  This was one of the earliest problem that was tackled
-by artificial intelligence.  As of today, 
+Hence, the task of disease diagnosis is a classification problem.  This was one of the earliest problems that
+was tackled by artificial intelligence.  As of today, 
 \href{https://en.wikipedia.org/wiki/Computer-aided_diagnosis}{computer-aided diagnosis} and 
 \href{https://en.wikipedia.org/wiki/Clinical_decision_support_system}{clinical decision support systems}
 have been used for more than 40 years in many hospitals.  Today, there are a number of diseases that can be
 diagnosed more accurately by a computer than by a specialist.  One such example is the
 \href{http://www.ultromics.com}{diagnosis of heart disease}.  Other applications of classification are the following:
-\begin{enumerate}
+\begin{enumerate}[(a)]
 \item image recognition,
 \item speech recognition,
 \item credit card fraud detection,
@@ -248,18 +248,7 @@ $\mathbf{\widehat{x}} \in \mathbb{R}^n$ to satisfy
 $\mathbf{\widehat{x}} = \arg\max\limits_{\mathbf{x}\in \mathbb{R}^n} f$ \quad is that we must have \quad $\nabla f(\mathbf{\widehat{x}}) = \mathbf{0}$,
 \\[0.2cm]
 i.e.~the \href{https://en.wikipedia.org/wiki/Gradient}{gradient} of $f$, which we will write as $\nabla f$,
-vanishes at the maximum.  Remember that the gradient of $f$ is defined as the vector
-\\[0.2cm]
-\hspace*{1.3cm}
-$\nabla f := \left(
- \begin{array}{c}
- \ds\frac{\partial f}{\partial\, x_1} \\
-    \vdots                            \\[0.1cm]
- \ds\frac{\partial f}{\partial\, x_n} \\ 
- \end{array}
- \right).
-$
-\vspace*{0.2cm}
+vanishes at the maximum $\mathbf{\widehat{x}}$.
 
 \begin{figure}[!th]
 \centering
@@ -269,6 +258,15 @@ $
 \caption{The function $x \mapsto \sin(x) - \frac{1}{2} \cdot x^2$.}
 \label{fig:sin-minus-square.pdf}
 \end{figure}
+
+\noindent
+Remember that the gradient of the function $f$ is defined as the column vector
+\\[0.2cm]
+\hspace*{1.3cm}
+$\ds \nabla f :=
+    \left\langle \frac{\partial f}{\partial\, x_1}, \cdots, \frac{\partial f}{\partial\, x_n} \right\rangle^\top
+$.
+\vspace*{0.2cm}
 
 \noindent
 Unfortunately, in many cases the equation 
@@ -320,7 +318,7 @@ Therefore, the definition of $\mathbf{x}_{n+1}$ is given as follows:
 \hspace*{1.3cm}
 $\mathbf{x}_{n+1} := \mathbf{x}_n + \alpha \cdot \nabla f(\mathbf{x}_n)$ \quad for all $n \in \mathbb{N}_0$.
 \\[0.2cm]
-Here, $\alpha$ is called the \blue{step size} also known as the \blue{learning rate}.  It determines by how
+Here, $\alpha$ is called the \blue{step size} and is also known as the \blue{learning rate}.  It determines by how
 much we move in the direction of the gradient.  In practise, it is best to adapt the step size dynamically
 during the iterations.  Figure \ref{fig:gradient-ascent.py} on page \pageref{fig:gradient-ascent.py} shows
 how this is done. 
@@ -341,13 +339,14 @@ Next, let us discuss the implementation of gradient ascent.
 \begin{enumerate}
 \item \texttt{x} is initialized with the parameter \texttt{start}.  Hence, \texttt{start} is really the same as
       $\mathbf{x}_0$. 
-\item \texttt{fx} is the value that the function $f$ takes for the argument \texttt{x}.
+\item \texttt{fx} is the value $\texttt{f}(\texttt{x})$.
 \item \texttt{alpha} is the \blue{learning rate}.  We initialize \texttt{alpha} as $1.0$.  The learning rate
       will be adapted dynamically. 
 \item The body of the \texttt{while} loop starting in line 6 executes one iteration of gradient ascent.
 \item In each iteration, we store the values of $\mathbf{x}_n$ and $f(\mathbf{x}_n)$ in the variables
       \texttt{xOld} and \texttt{fOld}.  This is needed since we need to ensure that the values of
-      $f(\mathbf{x}_n)$ are increasing.
+      $f(\mathbf{x}_n)$ are increasing.  If this value of $f(\mathbf{x}_{n+1})$ is not bigger that
+      $f(\mathbf{x}_n)$ we revert to the old values.
 \item Next, we compute $\mathbf{x}_{n+1}$ in line 8 using the formula
       \\[0.2cm]
       \hspace*{1.3cm}
@@ -413,6 +412,7 @@ Next, let us discuss the implementation of gradient ascent.
 \caption{The gradient ascent algorithm.}
 \label{fig:gradient-ascent.py}
 \end{figure}
+\FloatBarrier
 
 The implementation of gradient ascent given above is not the most sophisticated variant of this algorithm.
 Furthermore, there are algorithms that are more powerful than gradient ascent.  The first of these methods is the
@@ -453,6 +453,16 @@ combined with the \blue{sigmoid function}.  Before we can discuss the details of
 define this function and state some of its properties.  
 
 \subsection{The Sigmoid Function}
+
+\begin{figure}[!ht]
+\centering
+\epsfig{file=Figures/sigmoid.eps, scale=0.7}
+\vspace*{-0.3cm}
+\caption{The sigmoid function.}
+\label{fig:sigmoid.eps}
+\end{figure}
+\FloatBarrier
+
 \begin{Definition}[Sigmoid Function\label{def:sigmoid}]
   The \href{https://en.wikipedia.org/wiki/Sigmoid_function}{sigmoid function} $S: \mathbb{R} \rightarrow [0, 1]$
   \index{sigmoid function} is defined as 
@@ -464,14 +474,6 @@ Figure \ref{fig:sigmoid.eps} on page \pageref{fig:sigmoid.eps} shows the sigmoid
 The sigmoid function is also known as the \blue{logistic function}. \index{logistic function}
 \eox
 \end{Definition}
-
-\begin{figure}[!ht]
-\centering
-\epsfig{file=Figures/sigmoid.eps, scale=0.7}
-\vspace*{-0.3cm}
-\caption{The sigmoid function.}
-\label{fig:sigmoid.eps}
-\end{figure}
 
 
 \noindent
@@ -632,7 +634,7 @@ $\mathbf{x} \cdot \mathbf{w} = \sum\limits_{i=1}^D x_i \cdot w_i$.
 \\[0.2cm] 
 To simplify calculations, it is assumed that $\mathbf{x}$ contains a \blue{constant feature} \index{constant feature}
 that always takes the value of $1$.
-Seeing this model the first time you might think that this model is not very general and that it can only be
+Seeing this model for the first time you might think that this model is not very general and that it can only be
 applied in very special circumstances.  However,  the features $x_i$ can be functions of arbitrary complexity
 and hence this model is much more general than it appears on first sight.
 
@@ -654,7 +656,19 @@ Given $N$ objects $o_1, \cdots, o_n $ with feature vectors $\mathbf{x}_1, \cdots
 $y_1,\cdots,y_n$, we
 want to determine the weight vector $\mathbf{w}$ such that the \blue{likelihood} $\ell(\mathbf{X}, \mathbf{y})$
 \index{likelihood} of all of our
-observations is maximized.  This approach is called the 
+observations is maximized, where $\mathbf{X}$ is the \blue{feature matrix} that is defined as
+\\[0.2cm]
+\hspace*{1.3cm}
+$\mathbf{X} := \left(
+  \begin{array}{c}
+    \bigl(\mathbf{x}^{(1)}\bigr)^\top  \\
+    \vdots                         \\
+    \bigl(\mathbf{x}^{(m)}\bigr)^\top
+  \end{array}
+  \right).   
+$
+\\[0.2cm]
+This approach is called the 
 \href{https://en.wikipedia.org/wiki/Maximum_likelihood_estimation}{maximum likelihood estimation}
 \index{maximum likelihood estimation} of the weights.
 As we assume that the probabilities of different observations are independent, the individual
@@ -664,12 +678,9 @@ of a given training set:
 \hspace*{1.3cm}
 $\ds \ell(\mathbf{X},\mathbf{y},\mathbf{w}) = \prod\limits_{i=1}^N P(y_i \;|\;\mathbf{x}_i,\mathbf{w})$.
 \\[0.2cm]
-Here, we have combined the different attribute vectors $\mathbf{x}_i$ into the matrix $\mathbf{X}$ such that
-$\mathbf{x}_i$ is the $i$-th row of the matrix $\mathbf{X}$.  Since it is
-easier to work with sums than with products, instead of maximizing the function
+Since it is easier to work with sums than with products, instead of maximizing the function
 $\ell(\mathbf{X},\mathbf{y},\mathbf{w})$ we instead maximize the logarithm of
-$\ell(\mathbf{X},\mathbf{y},\mathbf{w})$.  This logarithm is called the \blue{log-likelihood}
-\index{log-likelihood} and is defined as 
+$\ell(\mathbf{X},\mathbf{y},\mathbf{w})$.  This logarithm is called the \blue{log-likelihood} \index{log-likelihood} and is defined as 
 \\[0.2cm]
 \hspace*{1.3cm}
 $\ell\ell(\mathbf{X},\mathbf{y},\mathbf{w}) := \ln\bigl(\ell(\mathbf{X},\mathbf{y},\mathbf{w})\bigr)$. 
@@ -743,15 +754,15 @@ $\ds\sum\limits_{i=1}^N y_i \cdot x_{i,j} \cdot  S(-y_i \cdot \mathbf{x}_i \cdot
 \\[0.2cm]
 These are $D$ equations for the $D$ variables $w_1, \cdots, w_D$.  Due to the occurrence of the sigmoid function, these
 equations are nonlinear.  We can not solve these equations explicitly.  Nevertheless, our computation of the
-gradient of the log-likelihood was not in vain:  We will use the method of gradient ascent in order to find
+gradient of the log-likelihood was not in vain:  We will use the method of \blue{gradient ascent} to find
 the value of $\mathbf{w}$ that maximizes the log-likelihood.  This method has been outlined in the previous section.
 
 \subsection{Implementing Logistic Regression}
-
 In this section we will give a simple implementation of logistic regression.  We will use our implementation of
 logistic regression to predict whether a student will pass or fail a given exam.  Figure \ref{fig:exam.csv}
-shows a \href{https://en.wikipedia.org/wiki/Comma-separated_values}{\textsc{Csv}} file that contains the data
-we are going to explore.  Concretely, this file stores the hours a student has learned for a particular exam
+shows a \href{https://en.wikipedia.org/wiki/Comma-separated_values}{\textsc{Csv}} file I have borrowed from the
+Wikipedia page on \href{https://en.wikipedia.org/wiki/Logistic_regression}{logistic regression} that contains
+the data we are going to explore.  Concretely, this file stores the hours a student has learned for a particular exam
 and the fact whether the student has passed the exam or has failed.  A passed exam is encoded as the number
 $1$, while a failed exam is encoded as $0$.  The first column of the file stores these numbers.  The second
 column stores the number of hours that the student has learned in order to pass the exam.
@@ -847,7 +858,7 @@ subtle points that might easily be overlooked otherwise, we proceed to discuss t
 \caption{An implementation of logistic regression.}
 \label{fig:logistic_regression.py}
 \end{figure}
-
+\FloatBarrier
 
 
 \begin{enumerate}
@@ -868,10 +879,10 @@ subtle points that might easily be overlooked otherwise, we proceed to discuss t
       $\ds L(x) = \ln\bigl(S(X)\bigr) = \ln\left(\frac{1}{1 + \exp(-x)}\right) =- \ln\bigl(1 + \exp(-x)\bigr)$.
       \\[0.2cm]
       The implementation is more complicated than you might expect.  The reason has to do with
-      overflow.  Consider values of $x$ that are smaller than, say, $-1000$.  The problem is that
-      the expression $\mathtt{exp}(1000))$ evaluates to \texttt{Infinity}, which represents the
+      \blue{numerical overflow}.  Consider values of $x$ that are smaller than, say, $-1000$.  The problem is that
+      the expression $\mathtt{exp}(1000)$ evaluates to \texttt{Infinity}, which represents the
       mathematical value $\infty$.  But then $1 + \mathtt{exp}(1000))$ is also \texttt{Infinity} and
-      finally \texttt{log(1 + exp(1000))} is \texttt{Infinity}.  However, in reality we have
+      finally \texttt{log(1 + exp(1000))} is still \texttt{Infinity}.  However, in reality we have
       \\[0.2cm]
       \hspace*{1.3cm}
       $\ln\bigl(1 + \exp(1000)\bigr) \approx 1000$
@@ -898,12 +909,12 @@ subtle points that might easily be overlooked otherwise, we proceed to discuss t
       We have
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\ds \ell\ell(\mathbf{X},\mathbf{y};\mathbf{w}) = 
+      $\ds \ell\ell(\mathbf{X},\mathbf{y},\mathbf{w}) = 
            \sum\limits_{i=1}^N L\bigl(y_i \cdot(\mathbf{x}_i \cdot \mathbf{w})\bigr)
       $.
       \\[0.2cm]
       Here $L$ denotes the natural logarithm of the sigmoid of the argument.
-      It is assumed that $\mathbf{X}$ is a matrix.  Every observation corresponds to a row in this
+      It is assumed that $\mathbf{X}$ is the feature matrix.  Every observation corresponds to a row in this
       matrix, i.e.~the vector $\mathbf{x}_i$ is the feature vector containing the features of the
       $i$-th observation.  $\mathbf{y}$ is a vector describing the outcomes, i.e.~the elements
       of this vector are either $+1$ or $-1$.  Finally, $\mathbf{w}$ is the vector of coefficients.
@@ -911,7 +922,7 @@ subtle points that might easily be overlooked otherwise, we proceed to discuss t
       the log-lokelihood according to the formula
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\ds \frac{\partial\quad}{\partial\, w_j}\ell\ell(\mathbf{X},\mathbf{y};\mathbf{w}) =
+      $\ds \frac{\partial\quad}{\partial\, w_j}\ell\ell(\mathbf{X},\mathbf{y},\mathbf{w}) =
         \ds\sum\limits_{i=1}^N y_i \cdot x_{i,j} \cdot  S(-y_i \cdot \mathbf{x}_i \cdot \mathbf{w})
       $.
       \\[0.2cm]
@@ -919,7 +930,7 @@ subtle points that might easily be overlooked otherwise, we proceed to discuss t
       The arguments are the same as the arguments to the log-lokelihood.
 \item Finally, the function \texttt{logisticRegressionFile} that is shown in Figure
       \ref{fig:logistic_regression.py:2} takes one argument.  This argument
-      is the name of the \texttt{.csv} file containing the data that are to be analysed.  
+      is the name of the \textsc{Csv} file containing the data that are to be analysed.  
       The task of this function is to read the \textsc{Csv} file, convert the data in the feature matrix
       $\mathbf{X}$ and the vector $\mathbf{y}$, and then to use the method of gradient ascent to find the weight vector
       $\mathbf{w}$ that maximize the likelihood.  In detail this function works as follows.
@@ -935,6 +946,7 @@ subtle points that might easily be overlooked otherwise, we proceed to discuss t
             As there is only a single feature, namely the hours a student has studied, all rows of this matrix
             have a length of $1$. 
       \item Next, we prepend a column of ones to this matrix.  This is done in line 48.
+            This frees us from dealing explicitly with a bias term in our model.      
       \item In logistic regression we assume that the entries of the vector $\mathbf{y}$ are either $+1$ or
             $-1$.  As the data provided in our input file contains $1$ and $0$, we need to apply a function that maps $1$ to $+1$ and $0$ to $-1$.
             The function
@@ -958,7 +970,8 @@ subtle points that might easily be overlooked otherwise, we proceed to discuss t
 \centering
 
 \begin{minted}[ frame         = lines, 
-                framesep      = 0.3cm, 
+                framesep      = 0.3cm,
+                bgcolor       = sepia,
                 firstnumber   = 1,
                 numbers       = left,
                 numbersep     = -0.2cm,
@@ -996,6 +1009,7 @@ subtle points that might easily be overlooked otherwise, we proceed to discuss t
 \caption{The function \texttt{logisticRegression}.}
 \label{fig:logistic_regression.py:2}
 \end{figure}
+\FloatBarrier
 
 If we run the function \texttt{logisticRegressionFile} using the data shown in Figure
 \ref{fig:exam.csv} the resulting values of the weight vector \texttt{w} are
@@ -1016,8 +1030,7 @@ Figure \ref{fig:exam-probability.pdf} shows a plot of this probability $P(x)$.
 \caption{Probability of passing an exam versus hours of studying.}
 \label{fig:exam-probability.pdf}
 \end{figure}
-
-
+\FloatBarrier
 
 \subsection{Logistic Regression with SciKit-Learn}
 In this section we discuss how linear regression is done in the SciKit-Learn environment.
@@ -1115,7 +1128,7 @@ correctly.
 \caption{Logistic Regression using SciKit-Learn}
 \label{fig:Logistic-Regression-with-SciKit-Learn.ipynb}
 \end{figure}
-%\$
+\FloatBarrier
 
 Figure \ref{fig:Logistic-Regression-with-SciKit-Learn.ipynb} on page
 \pageref{fig:Logistic-Regression-with-SciKit-Learn.ipynb} shows a \textsl{Python} script that creates a
@@ -1157,11 +1170,11 @@ logistic regression classifier with the help of the SciKit-Learn package.
       $$ \vartheta_0 + \vartheta_1 \cdot h + \vartheta_2 \cdot q \geq 0. $$
       This can be rewritten as follows:
       $$  q \geq -\frac{\vartheta_0 + \vartheta_1 \cdot h}{\vartheta_2}. $$
-      The \blue{decision boundary} are those values of $(h, q)$ such that $P(h) = \frac{1}{2}$.  This set of
+      The \blue{decision boundary} are those values of $(h, q)$ such that $P(h, q) = \frac{1}{2}$.  This set of
       values satisfies the linear equation
       $$  q = -\frac{\vartheta_0 + \vartheta_1 \cdot h}{\vartheta_2}. $$
       We have plotted this decision boundary as a green line in Figure \ref{fig:exam-iq-boundary.pdf} on page
-      \pageref{fig:exam-iq-boundary.pdf}.  Everybody who is located to the right  this line is predicted to pass the exam,
+      \pageref{fig:exam-iq-boundary.pdf}.  Everybody who is located to the right of this line is predicted to pass the exam,
       while everybody who is located to the left is predicted to fail.
 
 
@@ -1170,7 +1183,7 @@ logistic regression classifier with the help of the SciKit-Learn package.
 \caption{Probability of passing an exam versus hours of studying.}
 \label{fig:exam-iq-boundary.pdf}
 \end{figure}
-
+\FloatBarrier
 \item Line 12 computes the number of data for which the predictions of the model are wrong.
       The method $\texttt{predict}(X)$ takes a design matrix $X$.  Each row of $X$ is assumed to be a feature
       vector. It creates a prediction vector.  The $i$-th entry of this vector is $1$ if the model predicts a
