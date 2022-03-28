@@ -37,7 +37,7 @@ We proceed to give an overview of the content of this chapter.
 \item Similarly to our treatment of logistic regression, we define a cost function that measure the quality of
       the predictions of a neural network on a training set.  In order to minimize this cost function using
       gradient descent, we have to compute the \blue{gradient} of the cost function with respect to the weights of the
-      neural network.  The algorithm which is used to compute this gradient is called \blue{back propagation}.
+      neural network.  The algorithm which is used to compute this gradient is called \blue{backpropagation}.
 \item In order to find the minimum of the cost function efficiently, we need an improved version of
       \blue{gradient descent}.  This improved version is known as \blue{stochastic gradient descent}.
 \item After having covered the theory, we implement a simple neural network that is able to recognize
@@ -101,7 +101,9 @@ weight vector $\mathbf{w}$.
 
 \begin{figure}[!h]
   \centering
-   \epsfig{file=Figures/nn1.pdf,scale=1.5}
+  \vspace*{-2cm}
+  \epsfig{file=Figures/nn1.pdf,scale=1.5}
+    \vspace*{-2cm}
    \caption{A neural network with topology $[3, 6, 4, 2]$.}
   \label{fig:nn1.pdf}
 \end{figure}
@@ -119,13 +121,15 @@ on page \pageref{fig:nn1.pdf} shows a small neural network with two hidden layer
 it has four layers and its topology is given by the list $[3, 6, 4, 2]$.  A larger neural network with three
 hidden layers is shown in Figure \ref{fig:nn2.pdf} on page \pageref{fig:nn2.pdf}.  I have written a small
 Jupyter notebook that can be used to draw diagrams of this kind. This notebook is available at
-\href{https://github.com/karlstroetmann/Artificial-Intelligence/blob/master/Python/NN-Architecture.ipynb}{NN-Architecture.ipynb}
+\href{https://github.com/karlstroetmann/Artificial-Intelligence/blob/master/Python/7%20Neural%20Networks/NN-Architecture.ipynb}{NN-Architecture.ipynb}
 in the \texttt{Python} subdirectory of my GitHub repository for this lecture. 
 
 
 \begin{figure}[!h]
   \centering
-   \epsfig{file=Figures/nn2.pdf,scale=1.5}
+  \vspace*{-2cm}
+  \epsfig{file=Figures/nn2.pdf,scale=1.5}
+  \vspace*{-2cm}
    \caption{A neural network with topology $[8, 12, 8, 6, 3]$.}
   \label{fig:nn2.pdf}
 \end{figure}
@@ -152,8 +156,10 @@ The $j$-th neuron in layer $l$ has the \blue{bias} $b_j^{(l)}$.  These biases of
 the \blue{bias vector} \index{bias vector}
 \\[0.2cm]
 \hspace*{1.3cm}
-$\mathbf{b}^{(l)} := \langle b_1^{(l)}, \cdots, b_{m(l)}^{(l)} \rangle^\top$.
-\\[0.2cm]
+$\mathbf{b}^{(l)} := \bigl\langle b_1^{(l)}, \cdots, b_{m(l)}^{(l)} \bigr\rangle^\top$.
+\FloatBarrier
+
+\noindent
 The \blue{activation} of the $j$-th neuron
 in layer $l$ is denoted as $a_j^{(l)}$ and is defined recursively as follows:
 \begin{enumerate}
@@ -253,7 +259,7 @@ $\ds C\Bigr(W^{(2)}, \cdots, W^{(L)}, \mathbf{b}^{(2)}, \cdots, \mathbf{b}^{(L)}
  \frac{1}{2 \cdot n} \cdot \sum\limits_{i=1}^n \Bigl(\mathbf{o}\bigl(\mathbf{x}^{(i)}\bigr) - \mathbf{y}^{(i)}\Bigr)^2
 $.
 \\[0.2cm]
-Note that this cost function is additive in the training examples $\langle \mathbf{x}^{(i)}, \mathbf{y}^{(i)} \rangle$.
+Note that this cost function is additive in the training examples $\bigl\langle \mathbf{x}^{(i)}, \mathbf{y}^{(i)} \bigr\rangle$.
 In order to simplify the notation we define
 \\[0.2cm]
 \hspace*{1.3cm}
@@ -298,13 +304,13 @@ There are three reasons for the recent success of neural networks.
 \begin{enumerate}
 \item The computing power that is available today has vastly increased in the last 20 years.
       For example, today the
-      \href{https://www.nvidia.com/en-us/deep-learning-ai/products/titan-rtx/}{Nvidia Titan RTX}
-      graphic card offers  130 teraflops in single precision performance.  It needs a power supply that
-      outputs 650 watt.  Contrast this with \href{https://en.wikipedia.org/wiki/ASCI_White}{ASCI White}, which
+      \href{https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/rtx-3090/}{NVIDIA RTX 3090}
+      graphic card offers 35 teraflops in single precision performance. It needs a power supply that
+      outputs 750 watt. Contrast this with \href{https://en.wikipedia.org/wiki/ASCI_White}{ASCI White}, which
       was the most powerful supercomputer in 2000: According to the article
       ``\href{https://en.wikipedia.org/wiki/History_of_supercomputing}{History of Supercomputing}'', 
       it  offered a performance of 7.2 teraflops and needed 6 megawatt to operate.  The cost to build ASCI
-      White was about $110,000,000\,\symbol{36}$.   To compare, the Nvidia Titan RTX costs $2,499\,\symbol{36}$.
+      White was about $110,000,000\,\symbol{36}$.   To compare, the NVIDIA RTX 3090 costs $1,\!499\,\symbol{36}$.
 \item The breakthrough in the theory of neural networks was the rediscovering of the
       \href{https://en.wikipedia.org/wiki/Backpropagation}{backpropagation algorithm} \index{backpropagation} by
       David Rumelhart, Geoffrey Hinton, and Ronald Williams \cite{rumelhart:1986} in 1986.  
@@ -399,14 +405,14 @@ component of $\mathbf{x}$ with the $i$-th component of $\mathbf{y}$.  Do not con
 the \href{https://en.wikipedia.org/wiki/Dot_product}{dot product}!  Although both multiply the vectors
 componentwise, the Hadamard product returns a vector, while the dot product returns a number.  Later, we will
 use the \href{http://www.numpy.org}{NumPy} package to represent vectors.  In NumPy, the Hadamard product of two
-vectors $\mathtt{x}$ and $\mathtt{y}$ is computed by the expression $\mathtt{x} * \mathtt{y}$.
+vectors $\mathtt{x}$ and $\mathtt{y}$ is conveniently computed by the expression $\mathtt{x} * \mathtt{y}$.
 
 \subsection{Backpropagation: The Equations}
 Now we are ready to state the \blue{backpropagation equations}.  \index{backpropagation equations}
 The first of these four equations reads as follows:
 \begin{equation}
   \label{eq:BP1}
-  \varepsilon^{(L)}_j = (a_j^{(L)} - y_j) \cdot S'\bigl(z_j^{(L)}\bigr)
+  \varepsilon^{(L)}_j = \bigl(a_j^{(L)} - y_j\bigr) \cdot S'\bigl(z_j^{(L)}\bigr)
  \quad \mbox{for all $j \in \{1, \cdots, m(L)\}$,}
   \tag{BP1}
 \end{equation}
@@ -473,9 +479,7 @@ $j$-th neuron in layer $l$, which is denoted as $b_j^{(l)}$.  We have
 This equation shows the reason for defining the error terms $\varepsilon_j^{(l)}$:  What we really need to
 compute is the partial derivative of $C_{\mathbf{x},\mathbf{y}}$ with respect to the biases and the weights.
 The equation (BP3) and the equation (BP4) below show how this can be done once we have computed the error terms
-$\varepsilon_j^{(l)}$.
-
-In vectorized notation, the equation (BP3) takes the following form:
+$\varepsilon_j^{(l)}$.  In vectorized notation, the equation (BP3) takes the following form:
 \begin{equation}
   \label{eq:BP3v}
   \nabla_{\mathbf{b}^{(l)}} C_{\mathbf{x}, \mathbf{y}} = \boldsymbol{\varepsilon}^{(l)}
@@ -546,16 +550,12 @@ versions of these equations since this is more efficient for two reasons:
 \end{enumerate}
 
 \subsection{A Proof of the Backpropagation Equations}
-Since we are living in a time of fake news and alternative facts where
-\href{https://www.theguardian.com/us-news/2018/aug/19/truth-isnt-truth-rudy-giuliani-trump-alternative-facts-orwellian}{truth isn't truth} 
-and not even a president can be trusted,  you should not gullibly trust in the validity of the backpropagation
-equations.  Instead,  
-we have to \textbf{prove} the backpropagation equations.  Although the proof is a bit tedious, it should be
+Next, we are going to prove the backpropagation equations.  Although the proof is a bit tedious, it should be
 accessible: We only need the \href{https://en.wikipedia.org/wiki/Chain_rule}{chain rule} from calculus and the 
 \href{https://en.wikipedia.org/wiki/Chain_rule#Multivariable_case}{chain rule} from
 \href{https://en.wikipedia.org/wiki/Multivariable_calculus}{multivariable calculus}. \index{chain rule}
 
-Lets us start with the proof of equations \ref{eq:BP1}.
+Let us start with the proof of equations \ref{eq:BP1}.
 Remember that we have defined the numbers $\varepsilon_j^{(l)}$ as
 \\[0.2cm]
 \hspace*{1.3cm}
@@ -617,7 +617,7 @@ $f: \mathbb{R}^k \rightarrow \mathbb{R}$ \quad and \quad
 $g: \mathbb{R}^n \rightarrow \mathbb{R}^k$. 
 \\[0.2cm]
 are differentiable\footnote{
-  If this text had been written in German, I would have said that $f$ and $g$ are ``\blue{total differenzierbar}''.
+  If I had written this text in German, I would have said that $f$ and $g$ are ``\blue{total differenzierbar}''.
 }.  
 If the function $h: \mathbb{R}^n \rightarrow \mathbb{R}$ is defined as
 \\[0.2cm]
@@ -709,12 +709,19 @@ In order to proceed, we need to evaluate the partial derivative
 $\ds\frac{\partial z_j^{(L)}}{\partial w_{j,k}^{(l)}}$.  The term $z_j^{(l)}$ has been defined as follows:
 \\[0.2cm]
 \hspace*{1.3cm}
-$\ds z_j^{(l)} = \left(\sum\limits_{k=1}^{m(l)} w_{j,k}^{(l)} \cdot S\bigl(z_k^{(l-1)}\bigr)\right) + b_j^{(l)}$.
+$\ds z_j^{(l)} = \left(\sum\limits_{k=1}^{m(l)} w_{j,i}^{(l)} \cdot S\bigl(z_i^{(l-1)}\bigr)\right) + b_j^{(l)}$.
 \\[0.2cm]
 Hence we have
 \\[0.2cm]
 \hspace*{1.3cm}
-$\ds\frac{\partial z_j^{(l)}}{\partial w_{j,k}^{(l)}} = S\bigl(z_k^{(l-1)}\bigr) = a_k^{(l-1)}$. 
+$
+\begin{array}[t]{lcl}
+        \ds\frac{\partial z_j^{(l)}}{\partial w_{j,k}^{(l)}}
+  & = & \ds\sum\limits_{i=1}^{m(l)} \frac{\partial w_{j,i}^{(l)}}{\partial w_{j,k}^{(l)}} \cdot S\bigl(z_i^{(l-1)}\bigr) \\[0.5cm]
+  & = & \ds\sum\limits_{i=1}^{m(l)} \delta_{i,k}\cdot S\bigl(z_i^{(l-1)}\bigr) \\[0.4cm]
+  & = & S\bigl(z_k^{(l-1)}\bigr) = a_k^{(l-1)}.
+\end{array}
+$
 \\[0.2cm]
 Combining these equations we arrive at
 \\[0.2cm]
@@ -1215,10 +1222,103 @@ proceeds as follows:
 \item Finally, we see how the computation can be started by creating an object of class \texttt{Network} and
       then calling the method \texttt{sgd}.
 \end{enumerate}
-The program discussed in this section is available as a jupyter notebook at the following address:
+The program discussed in this section is available as a jupyter notebook at the following link
 \\[0.2cm]
-\href{https://github.com/karlstroetmann/Artificial-Intelligence/blob/master/Python/Digit-Recognition.ipynb}{https://github.com/karlstroetmann/Artificial-Intelligence/blob/master/Python/Digit-Recognition-NN.ipynb}.
+\hspace*{1.3cm}
+\href{https://github.com/karlstroetmann/Artificial-Intelligence/blob/master/Python/7%20Neural%20Networks/Digit-Recognition.ipynb}{Digit-Recognition-NN.ipynb}.
+\\[0.2cm]
+The file is located in the directory \texttt{Python/Neural Networks} in my
+\href{https://github.com/karlstroetmann/Artificial-Intelligence}{github repository} for this lecture. 
 
+\section{Automatic Differentiation}
+All modern libraries for Neural networks, i.e.~\href{https://www.tensorflow.org}{TensorFlow} and
+\href{https://pytorch.org}{PyTorch} make heavy use of
+\href{https://en.wikipedia.org/wiki/Automatic_differentiation}{automatic differentiation}.
+\blue{Automatic differentiation} is a technique for computing the gradient of a function that does neither rely
+on numeric approximation nor does it force us to compute symbolic derivatives manually.  In fact, the technique
+is one of the major methodological breakthroughs in machine learning in particular and science and engineering
+in general in recent years.  Although the idea was first published in 1964 by R.E.~Wengert \cite{wengert:1964},
+it has only been widely understood an accepted in recent years Baydin et.~al.~\cite{baydin:2018}.
+
+There are two modes of automatic differentiation:  \blue{Forward mode} and \blue{reverse mode}.  Forward
+mode is quite inefficient when the number $n$ of input variables is big as it needs to traverse the
+\blue{computational graph} $n+1$ times (once to compute the values and $n$ times to compute the partial
+derivatives), while reverse mode needs to traverse the computational graph just twice.  We proceed the crucial
+notion of a computational graph.
+
+\begin{Definition}[Computational Graph]
+  A \blue{computational graph} \index{computational graph} is a list of \blue{computational nodes}
+  \index{computational node}.  There are five types of computational nodes:
+  \begin{enumerate}
+  \item A \blue{variable node} is tuple of length 1 of the form   
+        \\[0.2cm]
+        \hspace*{1.3cm}
+        $\langle x, \rangle$
+        \\[0.2cm]
+        where $x$ is a variable from the set $\{x_1,\cdots,x_n\}$.
+        This node is interpreted representing one of the input variables.
+  \item A \blue{constant node} is a pair of the form
+        \\[0.2cm]
+        \hspace*{1.3cm}
+        $\langle n, r\rangle$
+        \\[0.2cm]
+        where $n$ is the \blue{name} of the node and $r$ is a floating point number.  This node is interpreted
+        as the assignment
+        \\[0.2cm]
+        \hspace*{1.3cm}
+        $n \;\mathtt{:=}\; r$.
+        \\[0.2cm]
+        The name $n$ is a string that can be understood as the name of an auxiliary variable.
+  \item A \blue{unary node} is a pair of the form
+        \\[0.2cm]
+        \hspace*{1.3cm}
+        $\langle n, f, a\rangle$
+        \\[0.2cm]
+        where $n$ is the \blue{name} of the node, $f$ is an unary function symbol from the set
+        \\[0.2cm]
+        \hspace*{1.3cm}
+        $\{ \mathrm{sqrt}, \exp, \ln, \sin, \cos, \arctan \}$
+        \\[0.2cm]
+        and $a$ is either the name of a variable or the name of another node occurring in the list.
+        This node is interpreted as the assignment
+        \\[0.2cm]
+        \hspace*{1.3cm}
+        $n \;\mathtt{:=}\; f(a)$.        
+  \item A \blue{binary node} is a pair of the form
+        \\[0.2cm]
+        \hspace*{1.3cm}
+        $\langle n, o, a_1, a_2\rangle$
+        \\[0.2cm]
+        where $n$ is the \blue{name} of the node, $o$ is a binary operator from the set
+        \\[0.2cm]
+        \hspace*{1.3cm}
+        $\{ +, -, *, / \}$
+        \\[0.2cm]
+        and $a$ are either the names of a variable or the name of another node occurring in the list.
+        
+        This node is interpreted         as the assignment
+        \\[0.2cm]
+        \hspace*{1.3cm}
+        $n \;\mathtt{:=}\; a_1\; o\,\; a_2$.
+        \\[0.2cm]
+        The name $n$ is a string that can be understood as the name of an auxiliary variable.
+        The string $a$ is either the name of a variable or the name of another node occurring in the list.
+ \end{enumerate}
+ A computational graph $G$ is \blue{admissible} if for every node of the form
+\\[0.2cm]
+\hspace*{1.3cm}
+$\langle n, o, a_1, a_2\rangle$
+\\[0.2cm]
+that occurs in the list $G$ there are nodes labelled with $a_1$ and $a_2$ that occurs in the list $G$ before this node and for
+every  node of the form
+\\[0.2cm]
+\hspace*{1.3cm}
+$\langle n, f, a\rangle$
+\\[0.2cm]
+that occurs in the list $G$ there is a node labelled with $a$ that occurs in the list G before this node.
+If a computational graph is admissible, the nodes can be evaluated in the same order as they are listed in $G$.
+\eox
+\end{Definition}
 
 
 

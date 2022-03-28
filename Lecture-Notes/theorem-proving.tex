@@ -335,7 +335,7 @@ Now we are ready to formally define the notion $E \vdash s \approx t$.  This not
 \item If $E \vdash r \approx s$ and $E \vdash s \approx t$, then $E \vdash r \approx t$.  
       \hspace*{\fill} (\blue{Transitivity})
 \item If $\textsl{arity}(f) = n$ and $E \vdash s_i \approx t_i$ for all $i \in \{1,\cdots,n\}$, \\
-      then $E \models f(s_1,\cdots,s_n) \approx f(t_1,\cdots,t_n)$.
+      then $E \vdash f(s_1,\cdots,s_n) \approx f(t_1,\cdots,t_n)$.
       \hspace*{\fill} (\blue{Congruence})
 \item If $E \vdash s \approx t$ and $\sigma$ is a $\Sigma$-substitution, then $E \vdash s\sigma \approx t\sigma$.
       \hspace*{\fill} (\blue{Stability})
@@ -353,19 +353,19 @@ in a term $t$, the notion of the \blue{subterm} of a given term $t$ at a given p
   Given a term $t$ the set of all \blue{positions} of $t$ is written as $\Pos(t)$ and is defined by
   induction on $t$:
   \begin{enumerate}
-  \item $\Pos(x) := \bigl\{ [] \bigr\}$ \quad for every variable $x$.
-  \item $\Pos(c) := \bigl\{ [] \bigr\}$ \quad for every constant $c$.
+  \item $\Pos(x) := \bigl\{ [\;] \bigr\}$ \quad for every variable $x$.
+  \item $\Pos(c) := \bigl\{ [\;] \bigr\}$ \quad for every constant $c$.
   \item $\Pos\bigl(f(t_1,\cdots,t_n)\bigr) := 
-         \bigl\{ [] \bigr\} \cup \bigcup\limits_{i=1}^n \bigl\{ [i] + u \mid u \in \Pos(t_i) \bigr\}$ 
+         \bigl\{ [\;] \bigr\} \cup \bigcup\limits_{i=1}^n \bigl\{ [i] + u \mid u \in \Pos(t_i) \bigr\}$ 
         \quad for every term $f(t_1,\cdots,t_n)$. \eoxs
   \end{enumerate}
 \end{Definition}
 
 \begin{Definition}[Subterm at a given Position, $t/u$] \hspace*{\fill} \\
-  Given a term $t$ and a position $t \in \Pos(t)$, the \blue{subterm of $t$ at position $u$} is
+  Given a term $t$ and a position $u \in \Pos(t)$, the \blue{subterm of $t$ at position $u$} is
   written as $t/u$.  This expression is defined by induction on $u$.
   \begin{enumerate}
-  \item $t/[] := t$,
+  \item $t/[\;] := t$,
   \item $f(t_1,\cdots,t_n)/\bigl([i]+u\bigr) := t_i/u$.  \eoxs
   \end{enumerate}
 \end{Definition}
@@ -376,7 +376,7 @@ in a term $t$, the notion of the \blue{subterm} of a given term $t$ at a given p
   $t[u \mapsto s]$ denotes the term that results from $t$ when the subterm $t/u$ is replaced by the term 
   $s$.  This expression is defined by induction on $u$.
   \begin{enumerate}
-  \item $t\bigl[ [] \mapsto s \bigr] := s$,
+  \item $t\bigl[ [\;] \mapsto s \bigr] := s$,
   \item $f(t_1,\cdots,t_n)\bigl[ [i]+u \mapsto s \bigr] := f(t_1, \cdots, t_{i-1},t_i[u \mapsto s], t_{i+1},\cdots, t_n)$.  
         \eoxs
   \end{enumerate}
@@ -386,12 +386,12 @@ in a term $t$, the notion of the \blue{subterm} of a given term $t$ at a given p
 Define $t := (x \cdot y) \cdot z$.  Then we have
 \\[0.2cm]
 \hspace*{1.3cm}
-$\Pos\bigl((x \cdot y) \cdot z\bigr) = \bigl\{ [], [1], [1,1], [1,2], [2]\bigr\}$.
+$\Pos\bigl((x \cdot y) \cdot z\bigr) = \bigl\{ [\;], [1], [1,1], [1,2], [2]\bigr\}$.
 \\[0.2cm]
 Furthermore, we have the following:
 \begin{enumerate}
 
-\item $\bigl((x \cdot y) \cdot z\bigr)/[] = (x \cdot y) \cdot z$,
+\item $\bigl((x \cdot y) \cdot z\bigr)/[\;] = (x \cdot y) \cdot z$,
 \item $\bigl((x \cdot y) \cdot z\bigr)/[1] = x \cdot y$, and
 \item $\bigl((x \cdot y) \cdot z\bigr)/[1,2] = y$.
 \end{enumerate}
@@ -465,9 +465,9 @@ additional equations are added to $E$ in this process.  To proceed, we need the 
   A binary relation $\prec \;\subseteq\; \mathcal{T}_\Sigma \times \mathcal{T}_\Sigma$ is a
   \blue{rewrite order} if and only if we have the following:
   \begin{enumerate}
-  \item $\prec$ is a \blue{strict partial order} on $\mathcal{T}_\Sigma$, i.e we have
+  \item $\prec$ is a \blue{strict partial order} on $\mathcal{T}_\Sigma$, i.e. we have
         \begin{enumerate}
-        \item $\neg (s \prec s)$ \hspace*{2.6cm} for all $s \in \mathcal{T}_\Sigma$, i.e $\prec$ is \blue{irreflexive}.
+        \item $\neg (s \prec s)$ \hspace*{2.6cm} for all $s \in \mathcal{T}_\Sigma$, i.e. $\prec$ is \blue{irreflexive}.
         \item $r \prec s \wedge s \prec t \;\Rightarrow\; r \prec t$ \quad for all $r,s,t \in \mathcal{T}_\Sigma$,
               i.e. $\prec$ is \blue{transitive}. 
         \end{enumerate}
@@ -476,7 +476,7 @@ additional equations are added to $E$ in this process.  To proceed, we need the 
         \\[0.2cm]
         \hspace*{1.3cm}
         $r \prec l \;\Rightarrow\; r\sigma \prec l\sigma$ \quad for every substitution $\sigma$.
-  \item $\prec$ is a \blue{congruence}, i.e we have
+  \item $\prec$ is a \blue{congruence}, i.e. we have
         \\[0.2cm]
         \hspace*{1.3cm}
         $r \prec l \;\Rightarrow\; s[u \mapsto r] \prec s[u \mapsto l]$ for every $\Sigma$-term $s$ and every
@@ -611,7 +611,7 @@ $b \stackrel{_*}{\rightarrow} c$ holds.
       \hspace*{1.3cm}
       $s_{n} \rightarrow b$ \quad or \quad $b \rightarrow s_{n}$.
       \\[0.2cm]
-      We discuss theses cases one by one.
+      We discuss these cases one by one.
       \begin{enumerate}
       \item Case: $s_n \rightarrow b$.
 
@@ -816,7 +816,7 @@ We define $\texttt{count}(t,x)$ by induction on $t$.
 \item $\texttt{count}(y, x) := 0$ if $x \not= y$ for all variables $x,y \in \mathcal{V}$.
 \item $\texttt{count}\bigl(f(t_1,\cdots,t_n), x\bigr) := \sum\limits_{i=1}^n \texttt{count}(t_i, x)$.
 \end{enumerate}
-Now we are ready the define the \blue{Knuth-Bendix order}.  Given two terms $s$ and $t$  
+Now we are ready to define the \blue{Knuth-Bendix order}.  Given two terms $s$ and $t$  
 we have $s \prec t$ iff one of the following two conditions hold:
 \begin{enumerate}
 \item $w(s) < w(t)$ and $\texttt{count}(s, x) \leq \texttt{count}(t, x)$
@@ -1000,7 +1000,7 @@ syntactical equations $E$.  The reduction rules are as follows:
          \Big\langle E \cup \big\{ s_1 \doteq t_1, \cdots, s_n \doteq t_n\}, \sigma \Big\rangle.
       \]   
 
-      This rules is the reason that we have to work with a system of syntactical equations, because even if we
+      This rule is the reason that we have to work with a system of syntactical equations, because even if we
       start with a single syntactical equation the rule given above can increase the number of syntactical
       equations. 
 
@@ -1038,7 +1038,7 @@ $$
  \leadsto &  \big\langle \big\{\big\}, \{ x_1 \mapsto x_2,\; x_3 \mapsto f(x_4) \} \big\rangle \\[0.2cm]
 \end{array}
 $$
-Hence the methos is successful and we have that the substitution
+Hence the method is successful and we have that the substitution
 \\[0.2cm]
 \hspace*{1.3cm}
 $\{ x_1 \mapsto x_2,\; x_3 \mapsto f(x_4) \}$ \\[0.2cm]
