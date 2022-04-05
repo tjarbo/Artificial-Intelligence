@@ -103,15 +103,7 @@ of the problem.
 
 \begin{figure}[!ht]
 \centering
-\begin{minted}[ frame         = lines,
-                framesep      = 0.3cm,
-                firstnumber   = 1,
-                bgcolor       = sepia,
-                numbers       = left,
-                numbersep     = -0.2cm,
-                xleftmargin   = 0.3cm,
-                xrightmargin  = 0.3cm,
-              ]{python3}
+\begin{python3code}         
     problem = lambda m, i: 0 < m < i
 
     no_problem = lambda m, i: not problem(m, i) and not problem(3 - m, 3 - i)
@@ -133,7 +125,7 @@ of the problem.
 
     start = (3, 3, 1)
     goal  = (0, 0, 0)
-\end{minted}
+\end{python3code}
 \vspace*{-0.3cm}
 \caption{The missionary and cannibals problem coded as a search problem.}
 \label{fig:missionaries.stlx}
@@ -316,15 +308,7 @@ entire state space in memory.
 
 \begin{figure}[!ht]
 \centering
-\begin{minted}[ frame         = lines,
-                  framesep      = 0.3cm,
-                  firstnumber   = 1,
-                  bgcolor       = sepia,
-                  numbers       = left,
-                  numbersep     = -0.2cm,
-                  xleftmargin   = 0.8cm,
-                  xrightmargin  = 0.8cm,
-                ]{python3}
+\begin{python3code}
     to_list = lambda State: [list(row) for row in State]
     
     to_tuple = lambda State: tuple(tuple(row) for row in State)
@@ -361,7 +345,7 @@ entire state space in memory.
              (3, 4, 5), 
              (6, 7, 8)
            )
-\end{minted}
+\end{python3code}
 \vspace*{-0.3cm}
 \caption{The $3 \times 3$ sliding puzzle.}
 \label{fig:Sliding-Puzzle.ipynb}
@@ -774,8 +758,8 @@ The implementation of  \texttt{search} works as follows:
 When we test the implementation shown above with the $3 \times 3$ sliding puzzle, it takes 264 milliseconds 
 on my computer to find a solution.  This is an improvement compared to breadth first search.
 The memory consumption is reduced to 3 megabytes.  This is still a lot and is due to the fact that we still
-have to maintain the set $\texttt{Parent}$.  Fortunately, we will 
-be able to get rid of the set $\texttt{Parent}$ when we develop a recursive implementation of depth first
+have to maintain the dictionary $\texttt{Parent}$.  Fortunately, we will 
+be able to get rid of the dictionary $\texttt{Parent}$ when we develop a recursive implementation of depth first
 search in the following subsection. 
 
 However, there is also bad news: the solution that is found has a length of $8,251$ steps.  As the
@@ -2515,7 +2499,7 @@ that are nearer to the goal than the start state.  To make this idea more precis
 The final step would then solve the puzzle.  I have prepared a framework for taoistic search.  The file
 \\[0.2cm]
 \hspace*{1.5cm}
-\href{https://github.com/karlstroetmann/Artificial-Intelligence/blob/master/Python/Taoistic-Search-Frame.ipynb}{\texttt{Python/Taoistic-Search-Frame.ipynb}}
+\href{https://github.com/karlstroetmann/Artificial-Intelligence/blob/master/Python/1%20Search/Taoistic-Search-Frame.ipynb}{\texttt{Python/1 Search/Taoistic-Search-Frame.ipynb}}
 \\[0.2cm]
 from my github repository at
 \href{https://github.com/karlstroetmann/Artificial-Intelligence/}{\texttt{https://github.com/karlstroetmann/Artificial-Intelligence}} \linebreak

@@ -472,7 +472,7 @@ define the \blue{mean squared error} \index{mean squared error} \index{MSE}
   \mathtt{MSE} := \frac{1}{m-1} \cdot \sum\limits_{i=1}^{m} \Bigl(F\bigl(\mathbf{x}^{(i)}\bigr) - y^{(i)}\Bigr)^2. 
 \end{equation}
 Then, given the list of training examples $[\langle \mathbf{x}^{(1)}, y^{(1)} \rangle, \cdots, \langle
-\mathbf{x}^{n}, y^{(n)} \rangle]$, our goal is to minimize the $\mathtt{MSE}$.  
+\mathbf{x}^{(n)}, y^{(n)} \rangle]$, our goal is to minimize the $\mathtt{MSE}$.  
 In order to proceed, we need to have a \blue{model} for the function $F$.  The simplest model is a 
 \blue{linear model}, \index{linear model} i.e.~we assume that $F$ is given as 
 \\[0.2cm]
@@ -617,7 +617,8 @@ $ \delta_{i,j} :=
 \right.
 $
 \\[0.2cm]
-Then the partial derivative of $f$ with respect to $x_k$, which is written as $\ds\frac{\partial f}{\partial x_k}$, is computed as follows:
+Then the partial derivative of $f$ with respect to $x_k$, which is written
+as $\ds\frac{\partial f}{\partial x_k}$, is computed as follows:
 \\[0.2cm]
 \hspace*{1.3cm}
 $
@@ -649,7 +650,7 @@ $\ds \nabla f(\mathbf{x}) = 2 \cdot C \cdot \mathbf{x}$.
 Next, if the function $g: \mathbb{R}^n \rightarrow \mathbb{R}$ is defined as 
 \\[0.2cm]
 \hspace*{1.3cm}
-$g(\mathbf{x}) := \mathbf{b}^\top \cdot A \cdot \mathbf{x}$, \quad where $\mathbf{b} \in \mathbb{R}^n$ and $A \in \mathbb{R}^{n \times n}$,
+$g(\mathbf{x}) := \mathbf{b}^\top \cdot A \cdot \mathbf{x}$, \quad where $\mathbf{b} \in \mathbb{R}^m$ and $A \in \mathbb{R}^{m \times n}$,
 \\[0.2cm]
 then a similar, but slightly easier, calculation shows that
 \\[0.2cm]

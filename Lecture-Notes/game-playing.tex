@@ -369,7 +369,7 @@ this implementation.
             player \textts{O} is encoded as the number $1$.
       \end{enumerate}
       The function returns $1$ if \textts{player} has won the game, $-1$ if the game is lost for
-      \textts{player}, $0$ if its a draw, and \textts{None} if the game has not yet been decided.
+      \textts{player}, $0$ if it's a draw, and \textts{None} if the game has not yet been decided.
 \item The function \textts{finished} returns \textts{True} if the game is over.
 \end{enumerate}
 
@@ -480,7 +480,7 @@ that $s$ can be reached in one step from $\textts{State}$.  Furthermore, $v$ is 
 \subsection{Memoization}
 Let us consider how many states have to be explored in the case of tic-tac-toe by the minimax algorithm
 described previously.  We have 9 possible moves for player \textts{X} in the start state, then the player
-\textts{O} can respect with 8 moves, then there are 7 moves for player \textts{O} and so on until in the end
+\textts{O} can respond with 8 moves, then there are 7 moves for player \textts{O} and so on until in the end
 player \textts{X} has only $1$ move left.  If we disregard 
 the fact that some games are decided after fewer than 9 moves, the functions $\textts{maxValue}$ and
 $\textts{minValue}$ need to consider  a total of
@@ -725,37 +725,27 @@ E.~Knuth and Ronald W.~Moore \cite{knuth:1975}.
 
 \begin{figure}[!ht]
 \centering
-\begin{minted}[ frame         = lines, 
-                framesep      = 0.3cm, 
-                firstnumber   = 1,
-                bgcolor       = sepia,
-                numbers       = left,
-                numbersep     = -0.2cm,
-                xleftmargin   = 0.0cm,
-                xrightmargin  = 0.0cm,
-              ]{python3}
-    def alphaBetaMax(State, alpha, beta):
-        if finished(State):
-            return utility(State)
-        value = alpha
-        for ns in next_states(State, gPlayers[0]):
-            value = max(value, alphaBetaMin(ns, alpha, beta))
-            if value >= beta:
-                return value
-            alpha = max(value, alpha)
-        return value
-    
-    def alphaBetaMin(State, alpha, beta):
-        if finished(State):
-            return utility(State)
-        value = beta
-        for ns in next_states(State, gPlayers[1]):
-            value = min(value, alphaBetaMax(ns, alpha, beta))
-            if value <= alpha:
-                return value
-            beta = min(value, beta)
-        return value    
-\end{minted}
+\begin{python3code}
+def alphaBetaMax(State, alpha, beta):
+    if finished(State):
+        return utility(State)
+    for ns in next_states(State, gPlayers[0]):
+        value = alphaBetaMin(ns, alpha, beta)
+        if value >= beta:
+            return value
+        alpha = max(alpha, value)
+    return alpha
+
+def alphaBetaMin(State, alpha, beta):
+    if finished(State):
+        return utility(State)
+    for ns in next_states(State, gPlayers[1]):
+        value = alphaBetaMax(ns, alpha, beta)
+        if value <= alpha:
+            return value
+        beta = min(beta, value)
+    return beta
+\end{python3code}
 \caption{$\alpha$-$\beta$-Pruning.}
 \label{fig:Alpha-Beta-Pruning.ipynb:alphaBeta}
 \end{figure}
@@ -767,34 +757,26 @@ We proceed to discuss the implementation of the function $\textts{alphaBetaMax}$
 \begin{enumerate}
 \item If $\textts{State}$ is a terminal state, the function returns the $\textts{utility}$ of the given
       $\textts{State}$.
-\item The variable $\textts{value}$ is supposed to store the maximum of the values of all states
-      that can be reached from the given $\textts{State}$.
-      
-      According to the specification of $\textts{alphaBetaMax}$,  we are not interested in values that are less than
-      $\textts{alpha}$.  Hence, it suffices to initialize $\textts{value}$ with $\textts{alpha}$.   This way, in the case that we have
-      \\[0.2cm]
-      \hspace*{1.3cm}
-      $\textts{maxValue}(\textts{State}) < \alpha$,
-      \\[0.2cm]
-      instead of returning the true value of the given $\textts{State}$, the function
-      $\textts{alphaBeta}(\textts{State},\alpha,\beta)$ will instead return the value $\alpha$, which is permitted by its specification.
-\item Next, we iterate over all successor states $\textts{ns} \in \textts{next\_states}(\textts{State}, \textts{gPlayers}[0])$.
+\item We iterate over all successor states $\textts{ns} \in \textts{next\_states}(\textts{State}, \textts{gPlayers}[0])$.
 \item We have to recursively evaluate the states $\textts{ns}$ with respect to the minimizing player \textts{gPlayers[1]}.
-\item As the specification of $\textts{alphaBetaMax}$ ask us to compute the value of $\textts{State}$ only in
-      those cases where it is less than or equal to $\beta$, once we find a successor state $s$ that has a
-      value $\textts{value}$ that is at least as big as $\beta$ we can \blue{stop any further evaluation} of the successor
-      states and return the value $\textts{value}$.
+\item As the specification of $\textts{alphaBetaMax}$ asks us to compute the value of $\textts{State}$ only in
+      those cases where it is less than or equal to $\mathtt{beta}$, once we find a successor state $s$ that has a
+      $\textts{value}$ that is at least as big as $\mathtt{beta}$ we can \blue{stop any further evaluation} of the successor
+      states and return $\textts{value}$.
 
       This shortcut results in significant savings of computation time!
 \item Once we have found a successor state that has a value $\textts{value}$ greater than $\textts{alpha}$,
-      we can increase $\textts{alpha}$ to the value $\textts{value}$.  The reason is, that once we know we can
-      achieve a value of $\textts{value}$ we are no longer interested in any values that are less than $\textts{value}$.
+      we can increase $\textts{alpha}$ to $\textts{value}$.  The reason is, that once we know we can
+      achieve $\textts{value}$ we are no longer interested in any smaller values.
       This is the reason for assigning the maximum of $\textts{value}$ and $\textts{alpha}$ to $\textts{alpha}$.
+
+      After this assignment, $\texttt{alpha}$ will be at least $\texttt{value}$ and according to the specification
+      of $\texttt{alphaBetaMax}$ we can therefore return $\texttt{alpha}$.
 \end{enumerate}
 
 \remark
 There is a nice simulator for alpha-beta-pruning available at the following web address:
-\href{https://www.usama.dev/minimax-simulator}{https://www.usama.dev/minimax-simulator}.
+\href{https://raphsilva.github.io/utilities/minimax_simulator/}{https://raphsilva.github.io/utilities/minimax\_simulator/}.
 
 \subsection{Alpha-Beta-Pruning with Memoization}
 Adding memoization to the functions \textts{maxValue} and \textts{minValue} is non-trivial.
@@ -971,35 +953,27 @@ proceeds according to the following case distinction:
 
 \begin{figure}[!ht]
 \centering
-\begin{minted}[ frame         = lines, 
-                framesep      = 0.3cm, 
-                firstnumber   = 1,
-                bgcolor       = sepia,
-                numbers       = left,
-                numbersep     = -0.2cm,
-                xleftmargin   = 0.0cm,
-                xrightmargin  = 0.0cm,
-              ]{python3}
-    def alphaBetaMax(State, alpha, beta):
-        if finished(State):
-            return utility(State)
-        v = alpha
-        for ns in next_states(State, gPlayers[0]):
-            v = max(v, evaluate(ns, alphaBetaMin, v, beta))
-            if v >= beta:
-                return v
-        return v
-    
-    def alphaBetaMin(State, alpha, beta):
-        if finished(State):
-            return utility(State)
-        v = beta
-        for ns in next_states(State, gPlayers[1]):
-            v = min(v, evaluate(ns, alphaBetaMax, alpha, v))
-            if v <= alpha:
-                return v
-        return v
-\end{minted}
+\begin{python3code}
+def maxValue(State, alpha, beta):
+    if finished(State):
+        return utility(State)
+    for ns in next_states(State, gPlayers[0]):
+        value = evaluate(ns, minValue, alpha, beta)
+        if value >= beta:
+            return value
+        alpha = max(alpha, value)
+    return alpha
+
+def minValue(State, alpha, beta):
+    if finished(State):
+        return utility(State)
+    for ns in next_states(State, gPlayers[1]):
+        value = evaluate(ns, maxValue, alpha, beta)
+        if value <= alpha:
+            return value
+        beta = min(beta, value)
+    return beta    
+\end{python3code}
 \vspace*{-0.3cm}
 \caption{Cached implementation of the functions \texttt{alphaBetaMax} and \texttt{alphaBetaMin}.}
 \label{fig:alphaBetaCached}
@@ -1062,7 +1036,7 @@ Notice that in the calls of the function \textts{evaluate} we have to take care 
 $\textts{limit}$.  The function $\textts{evaluate}$ is responsible for administering the cache as previously.
 
 There is one further difference between the functions $\textts{maxValue}$ and $\textts{minValue}$ shown in
-Figure \ref{fig:Game.ipynb} and those versions of these functions that were shown previoulsly:
+Figure \ref{fig:Game.ipynb} and those versions of these functions that were shown previously:
 In Figure \ref{fig:Game.ipynb} the $\textts{NextStates}$ are stored in a priority queue such that the move that
 is considered to be the best has the highest priority.  This way, the best moves are tried first and as a
 result alpha-beta-pruning is able to prune larger parts of the search space.
@@ -1163,7 +1137,7 @@ More details about the weights of the pieces can be found in the Wikipedia artic
 ``\href{https://en.wikipedia.org/wiki/Chess_piece_relative_value}{chess piece relative value}''.
 
 \exercise
-The game \blue{three men's morris} is discribed in the following YouTube video:
+The game \blue{three men's morris} is described in the following YouTube video:
 \\[0.2cm]
 \hspace*{1.3cm}
 \href{https://www.youtube.com/watch?v=R-aSW1MQwEo}{\textts{https://www.youtube.com/watch?v=R-aSW1MQwEo}}
